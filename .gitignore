@@ -9,6 +9,8 @@ a.out
 *.a26
 *.lst
 *.sym
+*.asm linguist-language=Assembly
+*.h linguist-language=Assembly
 
 # Add in special Atari 7800-based binaries for good measure
 *.a78
