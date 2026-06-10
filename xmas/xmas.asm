@@ -10,7 +10,7 @@
 ;; Start our ROM code
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     seg
-    org $f000
+    org $f800
 
 Reset:
     CLEAN_START
@@ -218,3 +218,4 @@ Song:
     org $fffc
     .word Reset
     .word Reset
+    rorg $ffff
