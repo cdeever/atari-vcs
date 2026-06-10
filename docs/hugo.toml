@@ -1,0 +1,38 @@
+baseURL = "https://cdeever.github.io/atari-vcs/"
+languageCode = "en-us"
+title = "Programming the Atari VCS in Assembly"
+theme = "hugo-book"
+
+# Enable git-based last modified dates
+enableGitInfo = true
+
+# Book theme configuration
+[params]
+  # Sidebar title (shorter than full site title)
+  BookTitle = "Contents"
+  # Theme: auto follows system preference, or use "light" / "dark"
+  BookTheme = "auto"
+  # Show table of contents on the right
+  BookToC = true
+  # Enable search (requires extended Hugo)
+  BookSearch = true
+  # Repository for commit links
+  BookRepo = "https://github.com/cdeever/atari-vcs"
+  # Section to use for the homepage
+  BookSection = "docs"
+  # Edit-page links point at the docs/ subtree on the main branch
+  BookEditPath = "edit/main/docs/content"
+  # Set site description for SEO
+  description = "A hands-on guide to writing 6502 assembly games for the Atari VCS (the console later rebranded the 2600) with DASM and Stella."
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    style = "github"
+    noClasses = false
+    tabWidth = 4
+  [markup.tableOfContents]
+    startLevel = 1
+    endLevel = 4

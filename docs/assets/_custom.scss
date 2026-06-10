@@ -1,0 +1,93 @@
+// =============================================================================
+// Programming the Atari VCS in Assembly — Custom Styles
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Brand Colors & CSS Custom Properties (retro Atari palette)
+// -----------------------------------------------------------------------------
+
+:root {
+  --accent-color: #c8102e;   // Atari red
+  --accent-light: #fde2e4;
+  --accent-dark: #8f0a1f;
+  --bg-subtle: #faf7f2;
+  --bg-card: #ffffff;
+  --border-color: #e6e1d8;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --text-muted: #6b6256;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent-color: #ff6b4a;  // warm amber/orange for dark mode
+    --accent-light: #4a1f12;
+    --accent-dark: #ffa07a;
+    --bg-subtle: #1a1814;
+    --bg-card: #211e19;
+    --border-color: #3a352d;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --text-muted: #a89e8d;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Landing Hero
+// -----------------------------------------------------------------------------
+
+.landing-hero {
+  text-align: center;
+  padding: 0 1rem 1.5rem;
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Section Cards
+// -----------------------------------------------------------------------------
+
+.section-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.section-card {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  h3 {
+    color: var(--accent-color);
+    margin-top: 0;
+  }
+
+  p {
+    color: var(--text-muted);
+    margin-bottom: 0;
+  }
+}
