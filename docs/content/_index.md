@@ -8,7 +8,7 @@ type: docs
 <p class="subtitle">A hands-on guide to writing 6502 assembly games for the Atari Video Computer System — built around real, working code.</p>
 </div>
 
-The Atari Video Computer System — the **VCS** — has no framebuffer, almost no RAM, and a graphics chip that only renders a *single scanline at a time*. Programming it means thinking in CPU cycles and synchronizing your code to the electron beam as it sweeps down the screen — "racing the beam."
+The Atari Video Computer System — the **VCS** — has no framebuffer, almost no RAM, and a graphics chip that only renders a *single scanline at a time*. Programming it means thinking in CPU cycles and synchronizing your code to the electron beam as it sweeps down the screen — "Racing the Beam."
 
 > **A note on the name.** The machine launched in 1977 simply as the *Video Computer System*. It only became the "Atari 2600" in 1982, when the Atari 5200 arrived and the product line suddenly needed distinguishing numbers — so Atari pressed the console's **CX2600** part number into service as a brand. The "2600" name is therefore a retronym; throughout this book the machine is called the **VCS**, the name it shipped with.
 
@@ -22,7 +22,7 @@ This notebook is a working reference for that craft. It is not a hardware datash
 
 ## How It's Organized
 
-The chapters build from the toolchain up to whole games. Set up your tools, learn the 6502, then learn the TIA and how to draw by racing the beam. Playfield, sprites, collisions, input, and sound each get their own chapter, followed by advanced cartridge techniques and complete project walkthroughs.
+The chapters build from the toolchain up to whole games. Set up your tools, learn the 6502, then learn the TIA and how to draw by "Racing the Beam." Playfield, sprites, collisions, input, and sound each get their own chapter, followed by advanced cartridge techniques and complete project walkthroughs.
 
 <div class="section-cards">
 
@@ -31,6 +31,14 @@ The chapters build from the toolchain up to whole games. Set up your tools, lear
 ### [Getting Started]({{< relref "/docs/getting-started" >}})
 
 Installing DASM and Stella, the anatomy of a minimal ROM, and the build/run loop used throughout the book.
+
+</div>
+
+<div class="section-card">
+
+### [VCS Architecture]({{< relref "/docs/architecture" >}})
+
+The four chips that make up the machine — CPU, TIA, RIOT, and ROM — and the central idea that you are really programming the television.
 
 </div>
 

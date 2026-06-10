@@ -2,11 +2,12 @@
 title: "The TIA & Racing the Beam"
 weight: 30
 bookCollapseSection: true
+BookIcon: tv
 ---
 
 # The TIA & Racing the Beam
 
-The Television Interface Adapter (TIA) is the chip that makes the VCS unusual. It has no frame buffer — it generates the video signal one scanline at a time, in real time, as the electron beam sweeps across the screen. Your code must feed it the right register values *before the beam reaches the pixels they affect*. This is "racing the beam," and it shapes the structure of every VCS program.
+The Television Interface Adapter (TIA) is the chip that makes the VCS unusual. It has no frame buffer — it generates the video signal one scanline at a time, in real time, as the electron beam sweeps across the screen. Your code must feed it the right register values *before the beam reaches the pixels they affect*. This is "Racing the Beam," and it shapes the structure of every VCS program.
 
 This chapter explains the anatomy of an NTSC frame — 3 lines of VSYNC, 37 lines of VBLANK, 192 visible lines, and 30 lines of overscan — and how `WSYNC` and the `REPEAT`/`REPEND` macros let you spend exactly the right number of scanlines in each region.
 

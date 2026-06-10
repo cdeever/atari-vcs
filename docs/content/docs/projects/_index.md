@@ -2,6 +2,7 @@
 title: "Project Walkthroughs"
 weight: 100
 bookCollapseSection: true
+BookIcon: projects
 ---
 
 # Project Walkthroughs

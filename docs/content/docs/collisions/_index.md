@@ -2,6 +2,7 @@
 title: "Collisions"
 weight: 60
 bookCollapseSection: true
+BookIcon: collisions
 ---
 
 # Collisions

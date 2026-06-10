@@ -2,6 +2,7 @@
 title: "Sprites: Players & Missiles"
 weight: 50
 bookCollapseSection: true
+BookIcon: sprites
 ---
 
 # Sprites: Players & Missiles

@@ -2,6 +2,7 @@
 title: "Advanced Techniques"
 weight: 90
 bookCollapseSection: true
+BookIcon: advanced
 ---
 
 # Advanced Techniques

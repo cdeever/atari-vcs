@@ -119,7 +119,7 @@ A rough map of where things live in the 13-bit address space (use the `vcs.h` na
 Because an address *is* a chip, writing to a hardware register is often a **command with a side effect**, not a value you can read back later:
 
 - **Most TIA registers are write-only.** `sta COLUPF` sets the playfield color, but you cannot `lda COLUPF` to get it back — there's nothing there to read. If you need to know a register's current value, keep your own copy in RAM (a "shadow register") and write *that* to both.
-- **Strobe registers ignore the value entirely.** For some addresses, the mere act of writing triggers an action and the byte you wrote is discarded. The most important is `WSYNC`: `sta WSYNC` **halts the CPU until the start of the next scanline** — the cornerstone of racing the beam. Others include `RESP0`/`RESP1` (latch a sprite's horizontal position at the moment of the write), `HMOVE` (apply fine motion), and `CXCLR` (clear the collision latches). The conventional idiom is to `sta` whatever's already in `A`; the value is irrelevant.
+- **Strobe registers ignore the value entirely.** For some addresses, the mere act of writing triggers an action and the byte you wrote is discarded. The most important is `WSYNC`: `sta WSYNC` **halts the CPU until the start of the next scanline** — the cornerstone of "Racing the Beam." Others include `RESP0`/`RESP1` (latch a sprite's horizontal position at the moment of the write), `HMOVE` (apply fine motion), and `CXCLR` (clear the collision latches). The conventional idiom is to `sta` whatever's already in `A`; the value is irrelevant.
 
 ```asm
     sta WSYNC        ; the value of A doesn't matter — the *write* waits for the next line

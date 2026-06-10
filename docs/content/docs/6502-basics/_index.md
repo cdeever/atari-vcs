@@ -2,6 +2,7 @@
 title: "6502 Basics"
 weight: 20
 bookCollapseSection: true
+BookIcon: cpu
 ---
 
 # 6502 Basics

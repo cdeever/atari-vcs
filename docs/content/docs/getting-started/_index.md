@@ -2,14 +2,16 @@
 title: "Getting Started"
 weight: 10
 bookCollapseSection: true
+BookIcon: getting-started
 ---
 
 # Getting Started
 
-Before any of the hardware concepts matter, you need a working toolchain and a mental model of what an Atari VCS ROM actually *is*: a small blob of 6502 machine code that the console maps into its address space and begins executing at a fixed reset vector.
+With the big picture from the [Introduction]({{< relref "introduction" >}}) in hand — a VCS program is real-time television, built from four chips you reach by reading and writing memory — this chapter gets you set up to actually write one.
 
-This chapter covers the mental model you need before writing a line, the two tools you will use constantly — **DASM** to assemble source into a binary, and **Stella** to run and debug it — and walks through the smallest ROM that produces a stable picture.
+The work starts with the medium itself — how a television actually paints a picture — and then the underlying ideas you'll lean on constantly: thinking in bits, and the memory-mapped model by which you control every chip. From there the toolchain stops being bookkeeping and becomes simply *how you reach the hardware* — **DASM** assembles your instructions into a ROM image, and **Stella** runs that image so you can watch the machine execute it, line by line. The chapter ends at the smallest ROM that produces a stable picture, the skeleton every later project is built on.
 
+- **[How a Television Works]({{< relref "how-the-tv-works" >}})** — the beam, scanlines, frames, sync, and NTSC vs. PAL. The display medium that dictates everything else.
 - **[Prerequisite Knowledge: Bits & Memory-Mapped Hardware]({{< relref "prerequisites" >}})** — binary/hex, bit operations, and how registers are just memory addresses. Start here if you're new to low-level work.
 - **[Toolchain: DASM & Stella]({{< relref "toolchain" >}})** — installing the assembler and emulator and the build/run loop.
 - **[Anatomy of a Minimal ROM]({{< relref "minimal-rom" >}})** — the include files, the reset vector, and the frame loop skeleton.

@@ -2,6 +2,7 @@
 title: "Sound"
 weight: 80
 bookCollapseSection: true
+BookIcon: sound
 ---
 
 # Sound

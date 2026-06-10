@@ -2,6 +2,7 @@
 title: "Input"
 weight: 70
 bookCollapseSection: true
+BookIcon: input
 ---
 
 # Input

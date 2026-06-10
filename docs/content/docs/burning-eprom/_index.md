@@ -2,6 +2,7 @@
 title: "Burning to EPROM & Real Hardware"
 weight: 110
 bookCollapseSection: true
+BookIcon: eprom
 ---
 
 # Burning to EPROM & Real Hardware
