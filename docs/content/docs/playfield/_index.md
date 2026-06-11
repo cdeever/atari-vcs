@@ -27,6 +27,7 @@ For all that, it remains the **cheapest way to put graphics on screen** — one 
 
 - **[The Three Registers]({{< relref "registers" >}})** — exactly which bit of `PF0`/`PF1`/`PF2` lights which pixel, with the half-nibble and reversed-`PF1` quirks laid out in a diagram. (Left half only.)
 - **[Symmetry: Reflection & Repetition]({{< relref "symmetry" >}})** — where the right half of the screen comes from: mirrored or copied from the left.
-- **[The Asymmetric Playfield]({{< relref "asymmetric" >}})** — escaping symmetry by rewriting the registers mid-scanline, and mixing symmetric and asymmetric bands down the screen.
+- **[The Asymmetric Playfield]({{< relref "asymmetric" >}})** — escaping symmetry by rewriting the registers mid-scanline, with the cycle-by-cycle safe-write schedule.
+- **[Building a Scoreboard]({{< relref "scoreboard" >}})** — a worked example: digit graphics, bit-masking two digits into a byte, ×5 indexing, and BCD scorekeeping.
 
 > The playfield's defining quirk is its bit order. Getting a shape to look right means accounting for `PF0`'s half-nibble and `PF1` being reversed relative to `PF0` and `PF2`.

@@ -39,6 +39,8 @@ This is the one that reshapes how you write code: the 6502 has **no multiply or 
 
 The 6502 has a **decimal (BCD) mode**, toggled with `SED` / `CLD`, in which `ADC`/`SBC` operate on two decimal digits per byte. Its classic use is the **score**: keeping points in BCD means the value already reads as decimal digits, so displaying it is trivial. (The 6507 in the VCS supports this; the similar chip in the NES does not.)
 
+Two things to remember: decimal mode only changes `ADC`/`SBC` — and, like any add, the `ADC` still wants a `CLC` first. The `INC`/`DEC` instructions **ignore decimal mode entirely**, so you bump a BCD score with an add (`CLC` / `ADC #$01`), never with an increment.
+
 ## Tips & Caveats
 
 - **Velocities are just signed bytes.** Store a leftward speed as `$FF` (−1) and add it to a position; two's complement makes the subtraction "just work," wraparound and all.

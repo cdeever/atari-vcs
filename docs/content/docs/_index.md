@@ -18,6 +18,7 @@ New here? Start with the **[Introduction]({{< relref "/docs/introduction" >}})**
 8. **[Collisions]({{< relref "/docs/collisions" >}})** — hardware collision detection
 9. **[Input]({{< relref "/docs/input" >}})** — joysticks, paddles, switches
 10. **[Sound]({{< relref "/docs/sound" >}})** — the TIA audio channels
-11. **[Advanced Techniques]({{< relref "/docs/advanced" >}})** — bankswitching and beyond
-12. **[Project Walkthroughs]({{< relref "/docs/projects" >}})** — complete games from this repo
-13. **[Burning to EPROM & Real Hardware]({{< relref "/docs/burning-eprom" >}})** — getting your game onto a cartridge
+11. **[Kernel Techniques]({{< relref "/docs/kernel-techniques" >}})** — fitting a scanline's work into 76 cycles
+12. **[Advanced Techniques]({{< relref "/docs/advanced" >}})** — bankswitching and beyond
+13. **[Project Walkthroughs]({{< relref "/docs/projects" >}})** — complete games from this repo
+14. **[Burning to EPROM & Real Hardware]({{< relref "/docs/burning-eprom" >}})** — getting your game onto a cartridge

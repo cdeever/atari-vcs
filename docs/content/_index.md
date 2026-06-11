@@ -108,6 +108,14 @@ The AUDC/AUDF/AUDV registers, the two audio channels, and driving frame-based mu
 
 <div class="section-card">
 
+### [Kernel Techniques]({{< relref "/docs/kernel-techniques" >}})
+
+Cycle counting, precise waiting, multi-line kernels, and front-loading — the craft of fitting a scanline's work into 76 cycles.
+
+</div>
+
+<div class="section-card">
+
 ### [Advanced Techniques]({{< relref "/docs/advanced" >}})
 
 Bankswitching past 4K, RAM expansion, sprite multiplexing, and other tricks for pushing the hardware.
