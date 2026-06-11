@@ -135,3 +135,26 @@
     font-style: italic;
   }
 }
+
+// -----------------------------------------------------------------------------
+// Sidebar brand logo (heavy-sixer photo above the title)
+// -----------------------------------------------------------------------------
+
+.book-brand {
+  a { display: block; }
+
+  .book-logo-photo {
+    display: block;
+    width: 70%;
+    max-width: 150px;
+    height: auto;
+    margin: 0 0 0.5rem;
+    border-radius: 4px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .book-logo-title {
+    display: block;
+    line-height: 1.25;
+  }
+}

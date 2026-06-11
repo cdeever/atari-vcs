@@ -1,0 +1,9 @@
+<h2 class="book-brand">
+  <a href="{{ cond (not .Site.Home.File) .Sites.Default.Home.RelPermalink .Site.Home.RelPermalink }}">
+    {{- with resources.Get "heavy-sixer.jpeg" -}}
+      {{- $logo := .Resize "240x q85" -}}
+      <img class="book-logo-photo" src="{{ $logo.RelPermalink }}" width="{{ $logo.Width }}" height="{{ $logo.Height }}" alt="Atari VCS heavy sixer console" loading="lazy" />
+    {{- end -}}
+    <span class="book-logo-title">{{ .Site.Title }}</span>
+  </a>
+</h2>
