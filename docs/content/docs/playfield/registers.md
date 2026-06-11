@@ -21,7 +21,7 @@ digraph playfield {
   node [shape=plaintext];
   strip [label=<
 <table border="0" cellborder="1" cellspacing="0" cellpadding="6">
-<tr><td colspan="20"><b>Left half of the screen &#8212; 20 pixels, drawn left &#8594; right</b></td></tr>
+<tr><td colspan="20" bgcolor="#3a3a3a"><font color="#ffffff"><b>Left half of the screen &#8212; 20 pixels, drawn left &#8594; right</b></font></td></tr>
 <tr>
 <td bgcolor="#f6c6cc">PF0<br/><font point-size="10">bit 4</font></td>
 <td bgcolor="#f6c6cc">PF0<br/><font point-size="10">bit 5</font></td>
@@ -45,9 +45,9 @@ digraph playfield {
 <td bgcolor="#d2efd2">PF2<br/><font point-size="10">bit 7</font></td>
 </tr>
 <tr>
-<td colspan="4"><font point-size="10">PF0 &#8212; high nibble, ascending</font></td>
-<td colspan="8"><font point-size="10">PF1 &#8212; <b>reversed</b> (7&#8594;0)</font></td>
-<td colspan="8"><font point-size="10">PF2 &#8212; ascending</font></td>
+<td colspan="4" bgcolor="#9c2a33"><font color="#ffffff" point-size="10">PF0 &#8212; high nibble, ascending</font></td>
+<td colspan="8" bgcolor="#2f5d8a"><font color="#ffffff" point-size="10">PF1 &#8212; <b>reversed</b> (7&#8594;0)</font></td>
+<td colspan="8" bgcolor="#3a7d52"><font color="#ffffff" point-size="10">PF2 &#8212; ascending</font></td>
 </tr>
 </table>
 >];
