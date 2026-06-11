@@ -11,13 +11,11 @@ Once you can draw — playfield, sprites, a stable frame — the binding constra
 
 You have already met the pressure in its rawest form: the [asymmetric playfield]({{< relref "/docs/playfield/asymmetric" >}}) demands six precisely-timed register writes per line, and the [scoreboard]({{< relref "/docs/playfield/scoreboard" >}}) crams digit-fetching in around them. The techniques below are the general tools for that kind of work.
 
-## What this chapter covers
+Each technique here is a different answer to the same question — *how do I fit this line's work into 76 cycles?* — and they stack: count first, then wait, spread, or precompute whatever still won't fit.
 
-- **Counting cycles.** Knowing, cold, what each instruction costs (a zero-page load is 3, an absolute load 4, a taken branch 3, a page-crossing read +1) and adding them up so a line never overruns 76.
-- **Waiting precisely.** `WSYNC` parks you at the next line boundary, but mid-line you often need to burn an *exact* number of cycles — `NOP`s, the conventional "sleep" macro, and the [RIOT timer]({{< relref "/docs/architecture/riot" >}}) for longer spans.
-- **Multi-line kernels.** Two-line (and N-line) kernels output several scanlines per loop iteration, doing one line's setup while the previous line is still being drawn.
-- **Front-loading.** Computing the *next* line's values during the current line's slack, so the data is ready the instant the beam needs it.
-- **Tables over arithmetic.** Trading plentiful ROM for scarce cycles: precompute results into `.byte` tables and look them up instead of calculating at run time (see [Numbers & Arithmetic]({{< relref "/docs/prerequisites/numbers" >}})).
-- **Register and addressing discipline.** Reusing A/X/Y, keeping hot variables in zero page, and avoiding page-cross penalties to shave cycles where it counts.
+- **[Counting Cycles]({{< relref "counting-cycles" >}})** — the budgeting discipline: tallying a line from `WSYNC` to `WSYNC`, leaving margin, and spending cycles where they are.
+- **[Waiting Precisely]({{< relref "waiting-precisely" >}})** — landing on an exact cycle (`NOP`, the `SLEEP` macro) and waiting out whole regions with the [RIOT timer]({{< relref "/docs/architecture/riot" >}}).
+- **[Multi-Line Kernels]({{< relref "multi-line-kernels" >}})** — buying time by spreading work across two (or more) scanlines per loop, and the `VDEL` register that keeps them in sync.
+- **[Front-Loading & Tables]({{< relref "front-loading-and-tables" >}})** — doing the work *earlier* (before the line, or before the program runs) with prefetching and page-aligned lookup tables.
 
-> This chapter is being built out. For now it collects the techniques in one place and names them; the detailed, worked treatments arrive page by page. The foundational ideas live in [6502 Basics]({{< relref "/docs/6502-basics" >}}) (instruction costs) and [The Frame Structure]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}) (where the cycles go in a frame).
+> The foundations these build on: instruction costs in [6502 Basics → Cycles & Timing]({{< relref "/docs/6502-basics/cycles-and-timing" >}}), and where the cycles go in a frame in [The Frame Structure]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}).
