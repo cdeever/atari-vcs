@@ -34,6 +34,8 @@ StartFrame:
 
 `WSYNC` ("wait for sync") is the key instruction: storing to it halts the CPU until the beam reaches the start of the next scanline. It is how you spend time measured in *scanlines* without counting individual cycles. The `REPEAT n` / `REPEND` macro simply emits the enclosed instructions `n` times.
 
+> **What if you skip it?** The TIA has no concept of a "frame" — left alone it just emits scanlines forever, with no top and no bottom. The 3-line vertical-sync pulse is the *only* "new frame starts here" marker the TV ever receives, and **your code is the only thing that produces it.** Forget it and the picture **rolls vertically forever**, because the TV's vertical hold has nothing to lock onto. (Horizontal sync is the exception: the TIA generates it automatically every line, so the screen stays horizontally stable on its own — you only ever *wait* for it, never create it.) And if your code runs off the end without looping back to emit the next frame, the CPU simply keeps executing whatever bytes follow as instructions — there is no operating system to catch the fall.
+
 ## Vertical blank
 
 Hold `VBLANK` for the 37 blanking lines. In a real game this is where you'd run logic; the demo just waits:

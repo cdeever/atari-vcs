@@ -38,6 +38,16 @@ The TIA's job is to generate that whole signal — the visible colors *and* the 
 
 These aren't graphics calls; they are you, in software, **driving the television's timing.** The beam's relentless progress across and down the screen is the clock your entire program runs against. You don't get to be late.
 
+The three layers line up like this:
+
+| Component | Responsibility |
+|-----------|----------------|
+| **TV** | Keeps the beam moving and locks its sweep onto the incoming sync pulses |
+| **TIA** | Generates the sync pulses and the video signal |
+| **Your program** | Tells the TIA what to output and when — and when to wait for the beam (`WSYNC`) |
+
+The television and the TIA each do their part automatically; the only one of the three with any judgement to exercise — and any way to get it wrong — is your program.
+
 ## Why this reframes the whole job
 
 Put the two facts together — no buffer, and the beam as a clock you can't outrun — and the nature of VCS programming inverts:

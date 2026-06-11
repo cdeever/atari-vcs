@@ -27,19 +27,18 @@ The television has no idea where a "line" or a "frame" begins on its own — it 
 
 It helps to picture the TV not as passive but as a runner in a race trying to lock in on a perfect 8:00-minute-per-mile pace. The set's sweep circuitry has its own internal oscillators that already move the beam at *very nearly* the right speed — like a trained runner who can hold close to that pace from memory. Close, but not perfect: left alone, the timing slowly drifts. The sync pulses are the beat the runner locks onto, a metronome embedded in the signal. Each **horizontal** pulse is a tick that keeps every line on tempo; each **vertical** pulse is the downbeat that says *back to the top, a new frame begins.* The pulses don't drag the beam around from scratch — they keep an already-moving beam **locked** to the exact timing, the way a runner holds a perfect pace by matching a beat instead of guessing.
 
-On a conventional analog television broadcast — the over-the-air signal that fed living-room sets for decades, before digital transmission took over — these sync pulses originate from the broadcast equipment. On the VCS, the TIA generates the pulses that become part of the composite video signal, and the television locks its sweep circuitry onto them. However, your program determines when the TIA should generate the critical timing events. At the start of each frame, you instruct the TIA when to assert and release vertical sync. During the frame, you pace your code to the beam, often using the `WSYNC` ("wait for sync") idiom to pause until the next scanline begins before preparing it.
+On a conventional analog television broadcast — the over-the-air signal that fed living-room sets for decades, before digital transmission took over — these sync pulses arrive embedded in the incoming signal, and a healthy set re-locks to them line after line, frame after frame, with no one the wiser. You only learned they were there when something went wrong with them.
 
-The division of labor, at a glance:
+### When the picture loses lock
 
-| Component | Responsibility |
-|-----------|----------------|
-| **TV** | Keeps the beam moving and locks its sweep onto the incoming sync pulses |
-| **TIA** | Generates the sync pulses and the video signal |
-| **Your program** | Tells the TIA what to output and when — and when to wait for the beam (`WSYNC`) |
+If the sync was weak, mistimed, or missing — a fading antenna, a worn videotape, a marginal cable — the television's free-running oscillators had nothing solid to lock onto, and the picture broke in two telltale ways:
 
-If this timing is wrong — if vertical sync is the wrong length, or if your code falls behind the beam — the television loses its place. The picture may roll, tear, jitter, or disappear entirely. This is why so much VCS programming is really about timing. The TV follows the TIA's signal, the TIA follows its internal timing circuits, and your program must stay synchronized with both. The mechanics of doing that in code are explored in [The Frame Structure]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}).
+- **Vertical roll.** Without a clean vertical-sync pulse, the set couldn't find the top of the frame, so the whole image slid continuously up or down the screen — the black bar between frames tumbling past again and again.
+- **Horizontal tearing.** With unstable horizontal sync, lines stopped beginning at the same place, and the picture sheared into diagonal slants or dissolved into a herringbone of broken lines.
 
-> **What if you skip it?** The TIA has no concept of a "frame" — left alone it just emits scanlines forever, with no top and no bottom. The 3-line vertical-sync pulse is the *only* "new frame starts here" marker the TV ever receives, and **your code is the only thing that produces it.** Forget it and the picture **rolls vertically forever**, because the TV's vertical hold has nothing to lock onto. (Horizontal sync is the exception: the TIA generates it automatically every line, so the screen stays horizontally stable on its own — you only ever *wait* for it, never create it.) And if your code runs off the end without looping back to emit the next frame, the CPU simply keeps executing whatever bytes follow as instructions — there is no operating system to catch the fall.
+Older sets handed the viewer direct control over those very oscillators, as two knobs usually on the back or side: **Vertical Hold** and **Horizontal Hold**. Each nudged the free-running frequency of one oscillator up or down. When the picture rolled, you turned Vertical Hold until the frame caught and snapped still; when it tore or skewed, Horizontal Hold did the same. You were, quite literally, hand-tuning the runner's natural pace until it fell back into step with the beat in the signal.
+
+That is the medium the VCS must satisfy. Generating those sync pulses at exactly the right moments — so the television never has a reason to roll or tear in the first place — is the job of the console's video chip and your program, taken up in [The Video & Sound Chip (TIA)]({{< relref "/docs/architecture/programming-the-television" >}}) and [The Frame Structure]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}).
 
 ## Frames per second, and the two standards
 
@@ -50,23 +49,24 @@ A TV redraws the whole frame many times a second to produce a steady image. How 
 | Where | North America, Japan | much of Europe, Australia |
 | Refresh rate | ~60 frames/sec | ~50 frames/sec |
 | Scanlines per frame | **262** | **312** |
-| Lines a game typically draws | ~192 visible | ~228 visible |
-| Color-clocks per line | 228 (160 visible) | 228 (160 visible) |
-| CPU cycles per line | 76 | 76 |
+| Active (visible) lines | ~240 | ~288 |
+| Color clocks per line | 228 (~160 visible) | 228 (~160 visible) |
 
-The two share the *same* horizontal timing — 228 color clocks and 76 CPU cycles per scanline — so the moment-to-moment "race" across a line is identical. What differs is the **number of lines** in a frame and the **refresh rate**: a PAL frame is taller and arrives more slowly. PAL and NTSC also encode color completely differently, so the same `COLU*` value is a different hue on each.
+The two share the *same* horizontal timing — 228 color clocks per scanline — so a single line takes exactly as long on either standard. What differs is the **number of lines** in a frame and the **refresh rate**: a PAL frame is taller and arrives more slowly. PAL and NTSC also encode color completely differently, so the same color value shows as a different hue on each.
 
 ## "Resolution" isn't a setting — it's how you spend time
 
-The VCS has no resolution register. The picture's dimensions are simply a consequence of timing:
+An analog television has no fixed grid of pixels and no resolution dial. The picture's dimensions are just a consequence of the signal's timing:
 
-- **Horizontally**, the TIA emits 160 visible "color clocks" per line (the other 68 fall in HBLANK). That 160 is your horizontal canvas — a playfield pixel is 4 color clocks wide (40 across), and a sprite is positioned to a specific color clock.
-- **Vertically**, *you* decide how many scanlines to spend on the picture versus the blanking margins. Games conventionally use ~192 visible lines on NTSC, but nothing enforces it; the count is whatever your code produces, and it must add up to the standard's total (262 for NTSC) or the TV loses sync.
+- **Horizontally**, a scanline is a continuous sweep, not a row of pixels — but the color subcarrier limits how finely detail can change across it. In practice a line resolves on the order of **160 distinct steps** of visible width (the full line spans 228 "color clocks," with the remaining 68 lost to the horizontal-blank retrace). That is roughly the horizontal canvas a single line offers.
+- **Vertically**, the picture is simply as tall as the **number of visible scanlines** drawn between the blanking margins — there is no separate vertical-resolution setting, only lines, and they must add up to the standard's total (262 for NTSC) or the set loses sync.
 
-That's the mental shift this whole chapter is preparing you for: there is no buffer and no resolution dial, only a beam, a clock, and your code deciding what to show at each tick.
+So on a television, "resolution" isn't a number you select; it emerges from how the signal spends its color clocks along each line and how many of the standard's lines it lights. How a VCS program decides those things — filling that width, choosing those lines — is the craft picked up in the [Playfield]({{< relref "/docs/playfield" >}}) and [Sprites]({{< relref "/docs/sprites" >}}) chapters.
+
+That's the mental shift this whole chapter is preparing you for: there is no buffer and no resolution dial — only a beam, a clock, and a signal deciding what to show at each tick.
 
 ## Tips & Caveats
 
-- **The VCS output is non-interlaced.** Broadcast TV interlaces two half-frames ("fields") for extra vertical detail; the VCS skips that and redraws the same ~262-line frame every time. Real TVs accept this "240p-style" signal, but it's why VCS line counts (262, not 525) look low next to broadcast figures.
-- **Pick a target standard early.** Developing for NTSC and running on a PAL console means a slower 50 Hz game, extra scanlines to fill, and shifted colors. Decide up front and test against it; "looks right in [Stella]({{< relref "toolchain" >}})'s default NTSC" says nothing about PAL.
-- **You can't get cycles back.** Because each scanline is a fixed 76 CPU cycles, work that overruns a line pushes into the next one and corrupts the picture. The beam sets the pace; your code keeps up or the image breaks. This is revisited in detail under [Racing the Beam]({{< relref "/docs/tia-racing-the-beam" >}}).
+- **Broadcast TV is interlaced; console signals usually aren't.** A broadcast frame interlaces two half-frames ("fields") for extra vertical detail — 525 lines on NTSC all told. A game console like the VCS skips interlacing and redraws the same ~262-line frame every time, a "240p-style" signal that sets accept happily — which is why that 262 looks low beside the 525 broadcast figure.
+- **NTSC and PAL are not interchangeable.** The two standards differ in refresh rate, line count, and color encoding, so a program written for one will not simply work on the other — the different timing ripples all the way down into the code, which has to target a specific standard. Those consequences are taken up where the frame is built, in [The Frame Structure]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}).
+- **The beam never waits.** A scanline lasts a fixed slice of time, and the beam moves on whether or not the source is ready — anything not delivered in time simply isn't drawn. On the VCS this hardens into a strict per-line cycle budget, the subject of [Racing the Beam]({{< relref "/docs/tia-racing-the-beam" >}}).
