@@ -106,3 +106,32 @@
     height: auto;
   }
 }
+
+// -----------------------------------------------------------------------------
+// Green-screen code frames (retro phosphor terminal)
+// -----------------------------------------------------------------------------
+
+.book-page .markdown {
+  // block code = black background, phosphor-green text
+  pre {
+    background: #0a0f0a;
+    color: #33ff66;
+    border-color: #1e3a24;
+    text-shadow: 0 0 1px rgba(51, 255, 102, 0.35);
+  }
+
+  pre code {
+    color: inherit;
+    background: none;
+  }
+
+  // tint Chroma syntax tokens to green shades; keep comments dimmer for readability
+  pre .chroma,
+  pre.chroma {
+    color: #33ff66;
+  }
+  pre .c, pre .c1, pre .cm, pre .cp, pre .cs {
+    color: #5fae74;
+    font-style: italic;
+  }
+}
