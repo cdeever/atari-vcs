@@ -1,5 +1,5 @@
 {{ if not (.Page.Scratch.Get "graphviz") }}
-<script src="https://unpkg.com/@viz-js/viz@3.4.0/lib/viz-standalone.js"></script>
+<script src="{{ "js/viz-standalone.js" | relURL }}"></script>
 {{ .Page.Scratch.Set "graphviz" true }}
 {{ end }}
 
