@@ -91,3 +91,18 @@
     margin-bottom: 0;
   }
 }
+
+// -----------------------------------------------------------------------------
+// Graphviz Diagrams
+// -----------------------------------------------------------------------------
+
+.graphviz-diagram {
+  text-align: center;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+}
