@@ -1,6 +1,6 @@
 ---
 title: "How a Television Works"
-weight: 9
+weight: 10
 ---
 
 # How a Television Works
@@ -42,7 +42,7 @@ That is the medium the VCS must satisfy. Generating those sync pulses at exactly
 
 ## Frames per second, and the two standards
 
-A TV redraws the whole frame many times a second to produce a steady image. How many — and how many scanlines make up a frame — depends on the regional broadcast standard the set was built for. Two matter:
+A TV redraws the whole frame many times a second to produce a steady image. How many — and how many scanlines make up a frame — depends on the regional broadcast standard the set was built for. Two dominate, with a third worth naming:
 
 | | **NTSC** | **PAL** |
 |---|---|---|
@@ -53,6 +53,8 @@ A TV redraws the whole frame many times a second to produce a steady image. How 
 | Color clocks per line | 228 (~160 visible) | 228 (~160 visible) |
 
 The two share the *same* horizontal timing — 228 color clocks per scanline — so a single line takes exactly as long on either standard. What differs is the **number of lines** in a frame and the **refresh rate**: a PAL frame is taller and arrives more slowly. PAL and NTSC also encode color completely differently, so the same color value shows as a different hue on each.
+
+A third standard, **SECAM** (France, the former Soviet bloc, and parts of Africa and the Middle East), shares PAL's taller 50 Hz frame but encodes color differently again. It rarely enters into VCS work, so it's named here only for completeness — **this book targets NTSC throughout.**
 
 ## "Resolution" isn't a setting — it's how you spend time
 

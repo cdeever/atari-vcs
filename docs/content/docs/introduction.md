@@ -31,4 +31,4 @@ That's the entire cast. We'll meet each one properly in [VCS Architecture]({{< r
 
 You can't paint until you know your palette. The chapters move from that palette outward: first the hardware and the tools that reach it, then the CPU, then the TIA and the craft of drawing by "Racing the Beam," and finally sprites, input, sound, and getting a finished game onto real hardware. Each chapter is grounded in real, assembling code from this repository, so you can always read the explanation and then the source that proves it.
 
-When you're ready, start with **[Getting Started]({{< relref "/docs/getting-started" >}})**.
+When you're ready, start with **[Prerequisite Knowledge]({{< relref "/docs/prerequisites" >}})**.

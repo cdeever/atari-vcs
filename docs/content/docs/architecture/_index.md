@@ -22,7 +22,7 @@ That's the entire computer. There is no video memory, no operating system, no BI
 
 ## One bus, one address space
 
-The CPU talks to the other three chips the only way it can: by **reading and writing memory addresses**. The TIA, the RIOT, and the cartridge each respond to their own slice of the 6507's 13-bit address space, so a `sta` to one address changes a color while a `sta` to another stores a variable. This is the [memory-mapped model]({{< relref "/docs/getting-started/prerequisites" >}}) introduced in Getting Started, and it is the glue that makes four separate chips behave as one machine:
+The CPU talks to the other three chips the only way it can: by **reading and writing memory addresses**. The TIA, the RIOT, and the cartridge each respond to their own slice of the 6507's 13-bit address space, so a `sta` to one address changes a color while a `sta` to another stores a variable. This is the [memory-mapped model]({{< relref "/docs/prerequisites/memory-mapped" >}}) introduced in the prerequisites, and it is the glue that makes four separate chips behave as one machine:
 
 | Range | Chip | Contents |
 |-------|------|----------|

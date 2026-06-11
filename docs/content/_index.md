@@ -28,6 +28,14 @@ The chapters build from the toolchain up to whole games. Set up your tools, lear
 
 <div class="section-card">
 
+### [Prerequisite Knowledge]({{< relref "/docs/prerequisites" >}})
+
+How a television works, thinking in bits, and the memory-mapped interface — the mental model the VCS forces on you, before any code.
+
+</div>
+
+<div class="section-card">
+
 ### [Getting Started]({{< relref "/docs/getting-started" >}})
 
 Installing DASM and Stella, the anatomy of a minimal ROM, and the build/run loop used throughout the book.

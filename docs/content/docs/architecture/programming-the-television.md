@@ -16,7 +16,7 @@ For one chip, it does a lot — and all of it in real time, in step with the bea
 - **Collision detection** — hardware latches that record which objects overlapped on each scanline, so you don't compute overlaps yourself.
 - **Some input** — the analog paddle and light-gun lines, read through its `INPT` registers.
 
-Its registers live at addresses `$00`–`$3F`, and most are **write-only** — there is nothing to read back, so you keep a [shadow copy in RAM]({{< relref "/docs/getting-started/prerequisites" >}}) when you need to know a current value. The rest of this page is about the first and most demanding of those jobs: generating the picture.
+Its registers live at addresses `$00`–`$3F`, and most are **write-only** — there is nothing to read back, so you keep a [shadow copy in RAM]({{< relref "/docs/prerequisites/memory-mapped" >}}) when you need to know a current value. The rest of this page is about the first and most demanding of those jobs: generating the picture.
 
 ## No frame buffer, no safety net
 
