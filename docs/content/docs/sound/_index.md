@@ -7,10 +7,12 @@ BookIcon: sound
 
 # Sound
 
-The TIA has two independent audio channels, each controlled by three registers: `AUDC` selects the tone/noise type (the waveform divider mode), `AUDF` sets the frequency (a 5-bit divisor — so pitch resolution is coarse and not evenly tempered), and `AUDV` sets the volume. Music and effects are produced by updating these registers over time, usually once per frame from a data-driven sequence.
+The TIA has **two independent audio channels** — the whole orchestra — each described by three registers: `AUDC` (waveform), `AUDF` (pitch), and `AUDV` (volume). A sound is whatever you make by setting those registers and changing them over time, almost always once per [frame]({{< relref "/docs/prerequisites/how-the-tv-works" >}}). There's no sample memory and no envelopes; expressiveness is rewriting six registers on a schedule.
 
-This chapter covers the meaning of the `AUDC` modes, the frequency table problem (mapping musical notes onto the limited `AUDF` divisors), and a frame-counted note sequencer — the `Song` data table in `xmas/xmas.asm` is exactly this format: pairs of `(note, duration-in-frames)` terminated by a zero byte. For richer output, the `music/` project bypasses the tone generators entirely and drives the volume DAC directly.
+The chapter's recurring theme is *scarcity met with ingenuity*, sound edition: only two voices, a famously out-of-tune pitch ladder, and yet a library full of memorable music.
 
-- See the **[4-Voice Music Player]({{< relref "/docs/projects/music-player" >}})** walkthrough for the direct-DAC technique.
+- **[The Audio Registers]({{< relref "the-audio-registers" >}})** — the two channels, what `AUDC`/`AUDF`/`AUDV` each do, and the signal path.
+- **[Tones, Noise & Pitch]({{< relref "tones-noise-and-pitch" >}})** — the `AUDC` waveform families, and why the `AUDF` divisor leaves the VCS unable to play in tune.
+- **[Playing Music]({{< relref "playing-music" >}})** — a frame-counted sequencer driving a `(note, duration)` song table, plus envelopes and sound effects.
 
-> The VCS's pitches are quantized to the `AUDF` divisors and are famously out of tune. Picking the closest available divisor per note — and sometimes switching `AUDC` mode — is part of writing music for it.
+> The VCS's pitches are quantized to the `AUDF` divisors and are famously out of tune. Picking the closest available divisor per note — and sometimes switching `AUDC` mode — is part of writing music for it. For richer output, the [4-Voice Music Player]({{< relref "/docs/projects/music-player" >}}) bypasses the tone generators and drives the volume DAC directly.
