@@ -88,6 +88,16 @@ TXA         → GRP1/GRP0; column 6's
 
 So `NUSIZ` sets the *slots* and the just-in-time rewrites give each slot its own *bitmap* — that's how all six aliens in a row can differ (and animate). It is the single best demonstration in this book of [the sprite chapter's]({{< relref "/docs/sprites" >}}) two big multipliers stacked together: **copies** ([horizontal]({{< relref "/docs/sprites/size-and-copies" >}})) and **multiplexing** ([vertical]({{< relref "/docs/advanced/sprite-multiplexing" >}})).
 
+And the reuse doesn't stop at the formation. As the beam crosses each zone of the screen, the kernel re-dresses those same two players for a different job — flipping `NUSIZ` back to a single copy (`LDA #$00 / STA NUSIZ0`) above and below the swarm. Read top to bottom, one frame morphs P0 and P1 three times:
+
+| Band (top → bottom) | `NUSIZ` | What P0 & P1 *are* |
+|---|---|---|
+| top | `$00` — single | the **mothership** gliding across |
+| middle | `$05` — three copies | the **36 invaders**, re-armed per row |
+| bottom | `$00` — single | **you** — the cannon |
+
+Saucer, then armada, then your ship — the same two objects changing costume line by line. There are never more than two players in the machine; there only ever *appear* to be.
+
 ## How a hit invader disappears
 
 When you shoot an invader, it can't simply be *recolored* away: the three copies of a player share **one color register** per scanline, so there's no way to tint just one of them into the background. Instead, the game hides it at the **graphics** level — and reuses the very same mid-line rewrite machinery above.
@@ -116,9 +126,26 @@ With the players spoken for, the rest of the screen is built from the [remaining
 |--------|------|
 | **Player 0 + Player 1** | the **invaders** — each tripled (`NUSIZ=$05`) and multiplexed down the rows; reused for the **mothership** and your **cannon** |
 | **Ball / Missiles** | the **shots** — your laser climbing, the invaders' bombs falling (`ENABL`/`RESBL`/`HMBL` reposition them each frame) |
-| **Playfield** | the **shields** — the destructible bunkers you hide behind, plus the ground line and score area (`PF0`/`PF1`/`PF2`) |
+| **Playfield** | the **shields**, plus the ground line and score area (`PF0`/`PF1`/`PF2`) |
 
-Every pixel on screen traces back to those few registers. Nothing is wasted.
+Every pixel traces back to those few registers — but the shields are worth a second look, because they're the one thing on screen that *isn't* a sprite.
+
+## The shields: the one thing that isn't a sprite
+
+Every *actor* — the swarm, the saucer, your cannon, every shot — is one of the TIA's five movable objects. The **barricades are not.** They belong to the chip's *other*, completely separate graphics system: the [playfield]({{< relref "/docs/playfield" >}}). And that shows up two ways.
+
+**They're chunky.** A playfield "pixel" is four times the width of a sprite pixel and low-res — exactly why the bunkers look blocky next to the crisp invaders. The playfield is the 2600's tool for *structures* (walls, mazes, scores), and a row of shields is a textbook use; the three separate bunkers come from rewriting the playfield **mid-scanline**, an [asymmetric playfield]({{< relref "/docs/playfield/asymmetric" >}}).
+
+**They erode because they live in RAM.** A sprite's graphics sit in ROM — you can't shoot a hole in ROM. The shield pattern is read through a *pointer into a RAM buffer* (`LDA ($EE),Y / STA PF0`), so when a shot or bomb lands, the game clears the matching bits in that buffer and the next frame's playfield simply draws the chewed-up shape. Destructible cover falls straight out of "the playfield reads from mutable memory."
+
+So the real picture is **two** graphics systems, not one:
+
+| System | Pixels | Source | In Space Invaders |
+|---|---|---|---|
+| **5 movable objects** — P0, P1, M0, M1, Ball | sharp, freely positioned | ROM graphics | invaders / mothership / cannon, shots, bombs |
+| **1 playfield** — PF0/PF1/PF2 | chunky, low-res | a **RAM** buffer (so it can erode) | the **shields** (+ ground, score) |
+
+Every actor on the board is the two players wearing costumes; the only thing that *isn't* a sprite is the blocky, breakable wall you crouch behind. Nothing is wasted.
 
 ## The march, counted in decimal
 
