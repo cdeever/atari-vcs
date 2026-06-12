@@ -140,6 +140,14 @@ End-to-end builds from this repository, including the Christmas-tree demo and th
 
 <div class="section-card">
 
+### [Game Analysis]({{< relref "/docs/game-analysis" >}})
+
+Block-diagram teardowns of classic games — starting with Combat, whose structure *is* the frame loop this book teaches.
+
+</div>
+
+<div class="section-card">
+
 ### [Burning to EPROM & Real Hardware]({{< relref "/docs/burning-eprom" >}})
 
 Choosing a chip, preparing the ROM image, wiring the cartridge, and the bugs that only appear on a real console.

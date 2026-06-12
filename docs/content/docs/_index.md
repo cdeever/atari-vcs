@@ -22,4 +22,5 @@ New here? Start with the **[Introduction]({{< relref "/docs/introduction" >}})**
 12. **[Advanced Techniques]({{< relref "/docs/advanced" >}})** — bankswitching and beyond
 13. **[Hardware Quirks as Features]({{< relref "/docs/hardware-quirks" >}})** — bugs and side effects that became signature effects
 14. **[Project Walkthroughs]({{< relref "/docs/projects" >}})** — complete games from this repo
-15. **[Burning to EPROM & Real Hardware]({{< relref "/docs/burning-eprom" >}})** — getting your game onto a cartridge
+15. **[Game Analysis]({{< relref "/docs/game-analysis" >}})** — teardowns of classic games, starting with Combat
+16. **[Burning to EPROM & Real Hardware]({{< relref "/docs/burning-eprom" >}})** — getting your game onto a cartridge
