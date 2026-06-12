@@ -16,7 +16,7 @@ Every program in this book shares the same skeleton. Understanding these few lin
     include "macro.h"   ; helper macros, e.g. CLEAN_START
 ```
 
-`vcs.h` gives readable names to the hardware registers so you can write `sta COLUBK` instead of `sta $09`. `macro.h` provides convenience macros. Both ship in each project directory of this repo (they are byte-identical copies).
+`vcs.h` gives readable names to the hardware registers so you can write `sta COLUBK` instead of `sta $09`. `macro.h` provides convenience macros. In this repository both live in a shared top-level `include/` directory that every game reaches via DASM's [`-I../include`]({{< relref "toolchain" >}}) flag — a single source of truth rather than a copy per game.
 
 ## The origin and reset entry point
 

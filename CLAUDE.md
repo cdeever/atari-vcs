@@ -8,11 +8,11 @@ A collection of homebrew Atari 2600 (VCS) games and experiments written in 6502 
 
 ## Repository layout
 
-Each top-level directory is a **self-contained, independent project** with its own copy of `vcs.h` (TIA/RIOT register definitions) and `macro.h` (DASM helper macros like `CLEAN_START`). These header copies are byte-identical across projects — when editing one, consider whether the others need the same change.
+Shared headers live in a top-level **`include/`** directory — `vcs.h` (TIA/RIOT register definitions), `macro.h` (DASM helper macros like `CLEAN_START`), and `xmacro.h` (TIMER_SETUP/TIMER_WAIT timer macros). Each game references them through DASM's include path (`-I../include`), so they are a single source of truth rather than per-project copies. Each game directory holds only its own source and data.
 
-- `xmas/` — a Christmas-tree playfield demo (`xmas.asm`), the most actively developed project. Has a working `Makefile`.
-- `combat-src/` — work based on a disassembly of the original *Combat* cartridge (`dicombat2.asm`, ~70KB). Has a `Makefile` (note: its `run` target mistakenly points at `xmas.bin`).
-- `music/` — a 4-voice direct-DAC audio experiment (`wavetable.a`) that consumes 100% CPU, so it renders no video. Adds `xmacro.h` (TIMER_SETUP/TIMER_WAIT scanline-timing macros). **No Makefile** — build manually (see below).
+- `xmas/` — a Christmas-tree playfield demo (`xmas.asm`), the most actively developed project. Has a `Makefile`.
+- `combat-src/` — work based on a disassembly of the original *Combat* cartridge (`dicombat2.asm`, ~70KB). Has a `Makefile`. (Git-ignored.)
+- `music/` — a 4-voice direct-DAC audio experiment (`wavetable.a`) that consumes 100% CPU, so it renders no video. Uses `include/xmacro.h` for its scanline timing. Has a `Makefile`.
 
 ## Build & run
 
@@ -21,14 +21,14 @@ DASM is installed (`/opt/homebrew/bin/dasm`). Stella is **not** currently instal
 Build from inside a project directory:
 
 ```sh
-cd xmas && make          # assembles *.asm -> xmas.bin (+ .sym, .lst)
+cd xmas && make          # assembles xmas.asm -> xmas.bin (+ .sym, .lst)
 make run                 # launches Stella on the .bin
 ```
 
-The underlying DASM invocation (use this for `music/`, which has no Makefile, or to build a specific file):
+The underlying DASM invocation — note `-I../include`, which points DASM at the shared headers:
 
 ```sh
-dasm wavetable.a -f3 -v0 -omusic.bin -smusic.sym -lmusic.lst
+dasm xmas.asm -I../include -f3 -v0 -oxmas.bin -sxmas.sym -lxmas.lst
 ```
 
 Flags: `-f3` = raw cartridge output format, `-v0` = quiet, `-o` = binary out, `-s` = symbol table, `-l` = listing file. There is no separate lint or test step — assembling clean *is* the check, and the `.lst`/`.sym` outputs are the debugging artifacts.

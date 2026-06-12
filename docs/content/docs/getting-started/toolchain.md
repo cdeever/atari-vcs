@@ -23,16 +23,19 @@ DASM is the de-facto assembler for the VCS; Stella is the reference emulator and
 The canonical build command (from the repository's `xmas/Makefile`) is:
 
 ```sh
-dasm xmas.asm -f3 -v0 -oxmas.bin -sxmas.sym -lxmas.lst
+dasm xmas.asm -I../include -f3 -v0 -oxmas.bin -sxmas.sym -lxmas.lst
 ```
 
 | Flag | Meaning |
 |------|---------|
+| `-I` | **Include path**: a directory to search for `include` files. |
 | `-f3` | Output format 3: a raw cartridge image with no header — what the VCS expects. |
 | `-v0` | Verbosity 0: quiet unless there's an error. |
 | `-o`  | Output binary (`.bin`). |
 | `-s`  | Emit a **symbol table** (`.sym`) — every label and its address. |
 | `-l`  | Emit a **listing** (`.lst`) — source interleaved with the bytes and addresses it produced. |
+
+DASM looks for an `include "vcs.h"` first in the source file's own directory, then in any `-I` directory. So you can keep `vcs.h`/`macro.h` right next to your `.asm` and drop the `-I` entirely — but this repository keeps them in one shared top-level [`include/`]({{< relref "minimal-rom" >}}) directory, hence `-I../include`.
 
 The `.sym` and `.lst` files are your primary debugging aids: the listing shows exactly what each line assembled to, and the symbol table lets Stella's debugger show your label names.
 

@@ -47,9 +47,9 @@ Producing a clean audio sample stream requires the CPU's full attention on every
 ## Tips & Caveats
 
 - **This is the opposite end of the spectrum from the [Christmas tree]({{< relref "xmas-tree" >}}).** That demo spends nearly all its time on `WSYNC`s and none on computation; this one spends all of it computing audio. Most real games live in between, budgeting cycles across both.
-- **No Makefile here.** Unlike the other projects, `music/` has no `Makefile`. Assemble it directly:
+- **Source is `wavetable.a`, not `.asm`.** `cd music && make` builds it; the underlying command names the `.a` source and the shared headers explicitly:
   ```sh
-  dasm wavetable.a -f3 -v0 -omusic.bin -smusic.sym -lmusic.lst
+  dasm wavetable.a -I../include -f3 -v0 -omusic.bin -smusic.sym -lmusic.lst
   ```
 - **Zero page matters.** All the per-voice state lives at `$80+` (zero page) because zero-page addressing is a cycle cheaper per access — and in an inner loop that runs every sample, those cycles are the difference between hitting the audio rate and not.
 
