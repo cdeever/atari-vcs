@@ -16,5 +16,6 @@ The teardowns run roughly simplest to most elaborate — start with Pong to see 
 - **[Pong (a minimal teardown)]({{< relref "pong" >}})** — the irreducible minimum: two paddles, a ball, four screen regions, three collision latches. The bare frame loop with nothing else, and the best thing to read right after the basics.
 - **[Combat (1977)]({{< relref "combat" >}})** — the launch pack-in, and one of the most-studied 2600 sources. Its structure *is* the frame loop this book teaches, and it's a tour of nearly every chapter in a single 2 KB ROM.
 - **[Pitfall! (1982)]({{< relref "pitfall" >}})** — a 255-room jungle on a 4 KB cart, because the rooms aren't stored but *generated* from one byte by a linear-feedback shift register. The definitive "compute the world, don't store it" technique.
+- **[Adventure (1980)]({{< relref "adventure" >}})** — Pitfall's mirror image: ~30 rooms *stored* as a hand-authored map, with a general object engine on top. The first action-adventure, the first Easter egg, and an early case of object-oriented, data-driven design.
 
 > Reading other people's kernels is not cheating — it's the apprenticeship. The 2600 community has annotated many classic games precisely so the next generation can learn from them.
