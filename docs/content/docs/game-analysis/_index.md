@@ -18,5 +18,6 @@ The teardowns run roughly simplest to most elaborate — start with Pong to see 
 - **[Pitfall! (1982)]({{< relref "pitfall" >}})** — a 255-room jungle on a 4 KB cart, because the rooms aren't stored but *generated* from one byte by a linear-feedback shift register. The definitive "compute the world, don't store it" technique.
 - **[Adventure (1980)]({{< relref "adventure" >}})** — Pitfall's mirror image: ~30 rooms *stored* as a hand-authored map, with a general object engine on top. The first action-adventure, the first Easter egg, and an early case of object-oriented, data-driven design.
 - **[River Raid (1982)]({{< relref "riverraid" >}})** — Pitfall's idea turned on its side: a 16-bit shift register generates an *endless scrolling* river instead of a loop of rooms. The streaming-block technique, the cleanest full-cast use of the TIA's objects, and Carol Shaw's masterpiece.
+- **[Space Invaders (1980)]({{< relref "spaceinvaders" >}})** — the killer app that sold the console, and the ultimate sprite-economy trick: a whole 36-alien formation conjured from just *two* player objects via `NUSIZ` copies and multiplexing. One 4 KB ROM, 112 different games.
 
 > Reading other people's kernels is not cheating — it's the apprenticeship. The 2600 community has annotated many classic games precisely so the next generation can learn from them.

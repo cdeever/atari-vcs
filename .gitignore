@@ -13,8 +13,9 @@ a.out
 # Add in special Atari 7800-based binaries for good measure
 *.a78
 
-# Combat disassembly work
+# Disassembly work (derived from copyrighted commercial ROMs)
 combat-src/
+roms/
 
 # macOS junk
 .DS_Store
