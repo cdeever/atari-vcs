@@ -64,11 +64,11 @@ So the split is clean: the power-up **jump** is hardware (read two bytes at `$FF
 
 A row in the arcade game is **six invaders** across. The 2600 has *two* player objects. So how does a single scanline band show six aliens?
 
-The answer is [`NUSIZ`]({{< relref "/docs/sprites/size-and-copies" >}}). Maurer sets both `NUSIZ0` and `NUSIZ1` to `$05` — the **"three copies, medium spacing"** mode — so each player draws **three** evenly-spaced images instead of one. Three from P0 plus three from P1 makes **six invaders per row from two objects**, and it costs only the two register writes:
+The answer is [`NUSIZ`]({{< relref "/docs/sprites/size-and-copies" >}}). Maurer sets both `NUSIZ0` and `NUSIZ1` to `$06` — the **"three copies, medium spacing"** mode — so each player draws **three** evenly-spaced images instead of one. Three from P0 plus three from P1 makes **six invaders per row from two objects**, and it costs only the two register writes:
 
 ```
-LF1F2: STA    NUSIZ1   ; $05 = three copies, medium → 3 invaders
-LF1FA: STA    NUSIZ0   ; $05 = three copies, medium → 3 more
+LF1F2: STA    NUSIZ1   ; $06 = three copies, medium → 3 invaders
+LF1FA: STA    NUSIZ0   ; $06 = three copies, medium → 3 more
 ```
 
 That handles one row *across*. To stack the rows *down* the screen, the kernel does [sprite multiplexing]({{< relref "/docs/advanced/sprite-multiplexing" >}}) — and here is the part worth sitting with. **The TIA has only two player objects in the entire machine.** There is never a frame where 36 invaders exist in hardware. At any single instant the beam is painting **one scanline**, and on that line the chip holds just P0 and P1 (tripled by `NUSIZ`) — six sprites, no more. The rows above are already painted and gone; the rows below haven't happened yet. The formation only *looks* simultaneous because your eye fuses a frame the beam draws one line at a time.
@@ -93,7 +93,7 @@ And the reuse doesn't stop at the formation. As the beam crosses each zone of th
 | Band (top → bottom) | `NUSIZ` | What P0 & P1 *are* |
 |---|---|---|
 | top | `$00` — single | the **mothership** gliding across |
-| middle | `$05` — three copies | the **36 invaders**, re-armed per row |
+| middle | `$06` — three copies | the **36 invaders**, re-armed per row |
 | bottom | `$00` — single | **you** — the cannon |
 
 Saucer, then armada, then your ship — the same two objects changing costume line by line. There are never more than two players in the machine; there only ever *appear* to be.
@@ -126,7 +126,7 @@ With the players spoken for, the rest of the screen is built from the [remaining
 
 | Object | Role |
 |--------|------|
-| **Player 0 + Player 1** | the **invaders** — each tripled (`NUSIZ=$05`) and multiplexed down the rows; reused for the **mothership** and your **cannon** |
+| **Player 0 + Player 1** | the **invaders** — each tripled (`NUSIZ=$06`) and multiplexed down the rows; reused for the **mothership** and your **cannon** |
 | **Ball / Missiles** | the **shots** — your laser climbing, the invaders' bombs falling (`ENABL`/`RESBL`/`HMBL` reposition them each frame) |
 | **Playfield** | the **shields**, plus the ground line and score area (`PF0`/`PF1`/`PF2`) |
 
