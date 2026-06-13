@@ -11,7 +11,7 @@ Every console has a graphics chip. What makes the TIA — the Television Interfa
 
 For one chip, it does a lot — and all of it in real time, in step with the beam:
 
-- **Video** — the television signal itself: background, the 40-pixel playfield, two player sprites, two missiles, and a ball, plus the `VSYNC`/`VBLANK` sync signals that drive the TV's scan.
+- **Video** — the television signal itself: background, the 40-pixel playfield, two player sprites, two missiles, and a ball, plus the `VSYNC`/`VBLANK` sync signals that drive the TV's scan. That object list is no accident: two players with two shots are the tanks of *Tank* (later *Combat*), and the ball against a walled background is *Pong* — the two games the [hardware was built to play]({{< relref "/docs/introduction" >}}).
 - **Audio** — two independent sound channels.
 - **Collision detection** — hardware latches that record which objects overlapped on each scanline, so you don't compute overlaps yourself.
 - **Some input** — the analog paddle and light-gun lines, read through its `INPT` registers.

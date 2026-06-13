@@ -20,5 +20,6 @@ Hold onto that number. **76 CPU cycles per scanline is the single most important
 This chapter explains the anatomy of an NTSC frame — 3 lines of VSYNC, 37 lines of VBLANK, 192 visible lines, and 30 lines of overscan — and how `WSYNC` and the `REPEAT`/`REPEND` macros let you spend exactly the right number of scanlines in each region.
 
 - **[The Frame Structure]({{< relref "frame-structure" >}})** — VSYNC, VBLANK, the visible kernel, and overscan, with the loop from `xmas.asm`.
+- **[Color: Hue & Luminance]({{< relref "color" >}})** — the four color registers, how a color byte splits into hue and brightness, and the "four-color machine" you escape by rewriting colors per line.
 
 > The frame loop is the backbone of every game in this book. Once you can produce a stable, correctly-timed frame, the playfield and sprite chapters are about *what* you write during the visible scanlines.
