@@ -30,6 +30,8 @@ A rough map of where things live in the 13-bit address space (use the `vcs.h` na
 | `$280`–`$297` | RIOT | Joystick/switch ports and the interval timer |
 | `$F000`–`$FFFF` | Cartridge | Your ROM (and the reset vectors at the top) |
 
+> This is a rough map, not the register list. For the complete address-summary table — every TIA and RIOT register, its address, and whether it's read or write — see the [Stella Programmer's Guide]({{< relref "/docs/further-reading" >}}).
+
 ## Writes can be commands, not storage
 
 Because an address *is* a chip, writing to a hardware register is often a **command with a side effect**, not a value you can read back later:

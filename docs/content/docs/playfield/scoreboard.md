@@ -57,6 +57,14 @@ That single `PF1` byte now shows a two-digit number on the left half of the scre
 
 So far that's one number, mirrored or copied onto both halves. A *scoreboard* wants the left player's score on the left and the right player's on the right — two different things — which is exactly the [asymmetric playfield]({{< relref "asymmetric" >}}): build the left score's byte and write it during the left half, then build the right score's byte and rewrite the same register before the beam reaches the right half. Six playfield writes a line, every line of the scoreboard's height, on the [cycle schedule]({{< relref "asymmetric" >}}) from the previous page. This is *why* scoreboards are the canonical asymmetric-playfield exercise.
 
+## Two colors for free: score mode
+
+A scoreboard usually wants each player's score in *that player's* color. You could swap `COLUPF` mid-line, but the TIA has a control made for exactly this: **bit 1 (D1) of `CTRLPF`**, *score mode*. Set it, and the playfield stops using `COLUPF` and instead draws its **left half in `COLUP0` and its right half in `COLUP1`** — the two players' colors, with no per-line color writes at all.
+
+So the standard scoreboard kernel turns score mode on for the band of scanlines holding the digits and off again below: the left score comes out in player 0's color and the right in player 1's, while the [player objects themselves stay free]({{< relref "/docs/sprites/_index" >}}) for the game below. (Score mode is one of the bits packed into `CTRLPF` — see the [full register map]({{< relref "/docs/sprites/priority" >}}).)
+
+The trade: score mode colors the **entire playfield** those two halves for as long as it's on, so switch it on only across the score band, not as a per-digit effect.
+
 ## Counting in decimal (BCD)
 
 There's one more snag: a nibble holds 0–15, but a decimal digit only goes to 9. Set the 6502's **decimal mode** and arithmetic rolls each nibble over at 9 instead of 15, so the score stays a pair of clean decimal digits — already in the form the indexing code above expects:

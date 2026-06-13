@@ -23,6 +23,8 @@ Two registers shape *what a channel sounds like*: `AUDC` picks the waveform, and
 
 The exact character of all sixteen is genuinely best learned **by ear in [Stella]({{< relref "/docs/getting-started/toolchain" >}})** — sweep `AUDC` through its values with a fixed `AUDF` and listen. But two anchors carry most games: **4 for a melody tone** and **8 for noise.**
 
+> The [Stella Programmer's Guide]({{< relref "/docs/further-reading" >}}) lists what each of the sixteen `AUDC` values does — though it, too, recommends experimenting to find your sound.
+
 ## AUDF: pick a pitch — sort of
 
 `AUDF` is a 5-bit **divisor**, 0–31. The channel's frequency is the fixed audio clock divided by `AUDF + 1` (and by the waveform's own divider). Two consequences fall out of that:

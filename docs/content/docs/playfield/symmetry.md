@@ -23,7 +23,7 @@ Either way, **both halves come from one set of register values.** That is the ch
 - **Reflect** when the content is naturally symmetric — which most playfields are, so reflection is the common default. A maze, an arena, a framed border, or a centered emblem all look right mirrored.
 - **Repeat** when you want a horizontally tiling texture — a repeating brick course, a banded background — where the same motif twice is exactly the intent.
 
-The reflect bit lives in `CTRLPF` alongside other playfield controls (priority, and the score-mode coloring), and like any register it can be **rewritten between scanlines** — so one band of the screen can be reflected while another repeats.
+The reflect bit lives in `CTRLPF` alongside other playfield controls — [object priority]({{< relref "/docs/sprites/priority" >}}) and the [score-mode coloring]({{< relref "scoreboard" >}}) — and like any register it can be **rewritten between scanlines**, so one band of the screen can be reflected while another repeats.
 
 ## Tips & Caveats
 

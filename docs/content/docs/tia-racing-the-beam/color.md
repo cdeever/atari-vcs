@@ -43,6 +43,8 @@ The same byte produces a **different hue on NTSC than on PAL** — the two stand
 
 There is no neat RGB-style mapping to reason your way to a shade. The hues march around the spectrum in an order that's easy enough for golds, browns, and blues but frustrating elsewhere — a clean, saturated red is famously hard to land. The practical approach is empirical: open Stella's palette/color viewer, or write a quick kernel that paints `COLUBK` from a value you step with the joystick, and *look*. You'll memorize the dozen colors you actually use and look up the rest.
 
+> For the full numeric NTSC hue/luminance chart — every value and the color it produces — see the [Stella Programmer's Guide]({{< relref "/docs/further-reading" >}}).
+
 ## The four-color machine
 
 Count the registers again — background, playfield, player 0, player 1 — and you have the VCS's original promise: **four colors on screen at once.** That was the design expectation, and for a game built straight from the hardware's primitives it's the natural limit.

@@ -17,5 +17,8 @@ a.out
 combat-src/
 roms/
 
+# Reference manual (copyrighted Atari document — kept locally, not redistributed)
+Stella_Programmers_Guide_*.pdf
+
 # macOS junk
 .DS_Store
