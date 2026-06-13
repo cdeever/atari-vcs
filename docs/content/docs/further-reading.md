@@ -1,6 +1,7 @@
 ---
 title: "Further Reading"
 weight: 120
+BookIcon: further-reading
 ---
 
 # Further Reading
