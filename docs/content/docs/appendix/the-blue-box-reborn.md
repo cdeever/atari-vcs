@@ -7,7 +7,14 @@ weight: 10
 
 The rest of this book hands you a 2026 toolchain: write 6502 in a text editor, run [DASM]({{< relref "/docs/getting-started/toolchain" >}}), and watch the result in Stella a fraction of a second later. It works, it's free, and it would have looked like science fiction to the people who actually invented these games. In 1979 there was no Stella, no DASM, no PC on the desk. There was a refrigerator-sized minicomputer down the hall, a serial cable, and a blue sheet-metal box wired into the cartridge slot of a real console.
 
-This page rebuilds that original chain link by link — and then shows how to assemble a working replica of it on hardware you can buy or breadboard today: a **PiDP-11** running **RT-11**, a genuine period 6502 cross-assembler, a serial download, and a cartridge that holds your program in **RAM the VCS reads as ROM**. It is slower, fiddlier, and far less practical than `make run`. That is the entire point. This is the workflow David Crane used to write *Pitfall!*, recreated closely enough that you can feel the shape of the constraints he was working inside.
+This page builds a **blue-box-*like* approximation** of that chain from parts you can buy or breadboard today: a **PiDP-11** running **RT-11**, a period 6502 cross-assembler, a serial download, and a cartridge that holds your program in **RAM the VCS reads as ROM**. It is slower, fiddlier, and far less practical than `make run`, and that is the entire point — it puts you inside the *shape* of the constraints David Crane and his contemporaries worked under. It is a homage, not a reproduction: no one's exact 1979 rig is being rebuilt here.
+
+So be clear-eyed about which links are the real thing and which are honest modern stand-ins:
+
+- **Genuinely period-authentic.** The **PDP-11 architecture and RT-11** — the machine and OS a 2600 programmer actually faced; **MAC65**, a real Atari 6502 cross-assembler from 1978–79 (see the detour below); the **RAM-as-ROM** trick that *is* the blue box's whole idea; a **real Atari VCS** running real 6507 code; and the **edit → cross-assemble → download → playtest** loop.
+- **Approximation / modern stand-in.** **SIMH** *simulates* the PDP-11 (not real DEC iron, and far faster than 1979); the "blue box" itself is a **Raspberry Pi Pico** cart, not Crane's custom 6502 computer — and by default without its debug monitor and breakpoints; the assembler is the **coin-op** division's tools repurposed for the 2600, not the consumer group's own and not Activision's; and the "RS-232" umbilical is ordinary **USB serial**.
+
+With that honesty in place, here is the original chain — and then each link, approximated.
 
 ## How they actually did it
 
@@ -23,9 +30,9 @@ The blue box was more than passive memory. It ran a **debug monitor** that could
 
 **The loop.** Put together, the daily rhythm was: **edit** on the PDP-11 → **assemble** (and go get coffee) → **download** the object code over **RS-232** into the blue box → **playtest** on a real console → back to **edit**. Slow, serial, physical. Recreating that loop is what the rest of this page is about.
 
-## The chain, rebuilt
+## The chain, approximated
 
-Each link below maps one piece of the 1979 rig onto something you can stand up today. Build them in order; each one feeds the next.
+Each link below maps one piece of the 1979 rig onto something you can stand up today — some parts faithful, some stand-ins, as flagged above. Build them in order; each one feeds the next.
 
 ### The minicomputer → a PiDP-11
 
@@ -55,22 +62,22 @@ Either route, this is a **two-step toolchain, not a one-shot like DASM**: assemb
 
 ### The download → serial
 
-In 1979 the bridge from minicomputer to blue box was **RS-232**: the assembled bytes were streamed down a serial cable. You recreate exactly that. SIMH can attach a simulated serial port to a real one on the Raspberry Pi (or to a TCP socket), so you copy the finished cartridge image off RT-11 and send it down a wire to the cartridge you're about to build. This is the modern umbilical — slower than copying a file, and that slowness is part of the experience you're reconstructing.
+In 1979 the bridge from minicomputer to blue box was **RS-232**: the assembled bytes were streamed down a serial cable. You recreate the same idea with ordinary **USB serial**. SIMH can attach a simulated serial port to a real one on the Raspberry Pi (or to a TCP socket), so you copy the finished cartridge image off RT-11 and send it down a wire to the cartridge you're about to build. This is the modern umbilical — slower than copying a file, and that slowness is part of the experience you're reconstructing.
 
 ### The blue box → a Raspberry Pi Pico RAM cart
 
-Here is the modern blue box. A **Raspberry Pi Pico** is small, cheap, and fast enough to *be* a cartridge. Wired into the VCS cartridge slot, it watches the console's bus and answers reads exactly as a ROM would. The whole job is a tight loop conceptually equal to:
+Here is our blue-box stand-in — close in function, not in form. A **Raspberry Pi Pico** is small, cheap, and fast enough to *be* a cartridge. Wired into the VCS cartridge slot, it watches the console's bus and answers reads exactly as a ROM would. The whole job is a tight loop conceptually equal to:
 
 ```c
 // the Pico's entire job, in one line:
 put_data_on_bus(rom[get_requested_address()]);   // RAM answering as ROM
 ```
 
-It reads the **12 address lines** off its GPIO pins to learn which byte the 6507 wants, and drives the **8 data lines** with that byte from a buffer held in its own RAM. Because that buffer is RAM, you can **reload it over serial** from the PiDP-11 between runs without touching the console — the precise capability the blue box existed to provide. Hold the program in rewritable memory, present it to the console as ROM, and you've rebuilt Crane's umbilical with a £4 microcontroller. (The same family of cart can be taught a debug monitor and breakpoints too, if you want to chase the blue box's full feature set rather than just its core trick.)
+It reads the **12 address lines** off its GPIO pins to learn which byte the 6507 wants, and drives the **8 data lines** with that byte from a buffer held in its own RAM. Because that buffer is RAM, you can **reload it over serial** from the PiDP-11 between runs without touching the console — the precise capability the blue box existed to provide. Hold the program in rewritable memory, present it to the console as ROM, and you've approximated Crane's umbilical with a £4 microcontroller — same trick, very different box. (The same family of cart can be taught a debug monitor and breakpoints too, if you want to chase the blue box's full feature set rather than just its core trick.)
 
 ### The target → a real VCS
 
-The last link is the easy one and the whole reason for the other four: a **real Atari VCS**. Plug the Pico cart into the slot, power on, and the program you assembled on a simulated 1970s minicomputer is running on genuine 1977 silicon, painting a real picture on a real television. Spot a bug, and you run the loop again — **edit in RT-11 → assemble with MAC65 → download over serial → playtest** — the 1979 cycle, rebuilt on your bench.
+The last link is the easy one and the whole reason for the other four: a **real Atari VCS**. Plug the Pico cart into the slot, power on, and the program you assembled on a simulated 1970s minicomputer is running on genuine 1977 silicon, painting a real picture on a real television. Spot a bug, and you run the loop again — **edit in RT-11 → assemble with MAC65 → download over serial → playtest** — the 1979 cycle, approximated on your bench.
 
 ## Both chains, side by side
 
