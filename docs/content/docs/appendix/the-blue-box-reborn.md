@@ -5,7 +5,7 @@ weight: 10
 
 # The Blue Box, Reborn
 
-The rest of this book hands you a 2026 toolchain: write 6502 in a text editor, run [DASM]({{< relref "/docs/getting-started/toolchain" >}}), and watch the result in Stella a fraction of a second later. It works, it's free, and it would have looked like science fiction to the people who actually invented these games. In 1979 there was no Stella, no DASM, no PC on the desk. There was a refrigerator-sized minicomputer down the hall, a serial cable, and a blue sheet-metal box wired into the cartridge slot of a real console.
+The rest of this book hands you a 2026 toolchain: write 6502 in a text editor, run [DASM]({{< relref "/docs/getting-started/toolchain" >}}), and watch the result in Stella a fraction of a second later. It works, it's free, and it would have looked like science fiction to the people who actually invented these games. In 1979 there was no Stella, no DASM, no PC on the desk. There was a refrigerator-sized minicomputer down the hall, a serial cable, and — for David Crane at Activision — a blue sheet-metal box wired into the cartridge slot of a real console.
 
 This page builds a **blue-box-*like* approximation** of that chain from parts you can buy or breadboard today: a **PiDP-11** running **RT-11**, a period 6502 cross-assembler, a serial download, and a cartridge that holds your program in **RAM the VCS reads as ROM**. It is slower, fiddlier, and far less practical than `make run`, and that is the entire point — it puts you inside the *shape* of the constraints David Crane and his contemporaries worked under. It is a homage, not a reproduction: no one's exact 1979 rig is being rebuilt here.
 
