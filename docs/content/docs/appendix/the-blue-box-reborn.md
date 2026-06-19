@@ -33,16 +33,25 @@ You don't need to find a working PDP-11 (they weigh as much as a person and draw
 
 RT-11 is the right OS to land on here. It's small, single-user, and disk-based — much closer in spirit to the spartan environment a 1979 programmer faced than a modern Unix would be. You'll edit source and run the assembler entirely inside it.
 
-### The cross-assembler → MACXX on RT-11
+### The cross-assembler — a discovery
 
-This is the link that makes the whole exercise *authentic* rather than merely themed. **MACXX**, written by Dave Shepperd, is a macro assembler whose **first implementation was written in PDP-11 assembly for RT-11, with coding starting around early 1978** — and it was genuinely used to build old Atari game sources. It is, almost literally, the kind of tool Crane's contemporaries reached for. It was later rewritten in C (around 1982–83) and **still builds today on Linux, including on a Raspberry Pi**, so you have two honest options:
+This is the link that decides whether the exercise is genuinely *authentic* or merely *themed*, and it's where the trail gets interesting.
 
-- **Most authentic:** build/run MACXX *inside* RT-11 on the simulated PDP-11, so the assembler executes on the (simulated) period hardware.
-- **Pragmatic but still period-correct:** build the C version of MACXX natively on the PiDP-11's Raspberry Pi host. Same assembler lineage, far less yak-shaving.
+The obvious candidate is **MACXX**, Dave Shepperd's macro assembler, whose **first implementation was written in PDP-11 assembly for RT-11 with coding starting around early 1978** — and which was genuinely used to build old Atari game sources. That lineage is exactly what we want. The catch turns up the moment you go looking for it: the [version Shepperd publishes](https://github.com/DaveShepperd/macxx) is, in his own words, the **C rewrite** he made around 1982–83 for VAX/VMS — *"this is that code."* The original RT-11 assembly source doesn't appear to survive anywhere public. So MACXX gives us the right *pedigree*, but today only as a program you build and run on the **Raspberry Pi host** — period-lineage, not actually executing on the PDP-11.
 
-MACXX is a two-step toolchain, not a one-shot like DASM. You **assemble** each source file to an object file, **link** the objects with its companion linker **`LLF`**, and then convert the linked output into a flat cartridge image with **`MIXIT`**. The end product is the same thing DASM's `-f3` gives you: a raw binary, 2K or 4K, with the 6507 **reset vectors at the very top** (`$FFFC/$FFFD` pointing at your entry label) and code based at **`$F000`**, exactly as described in [Preparing the Image]({{< relref "/docs/burning-eprom/preparing-the-image" >}}).
+That itch — *I want the assembler running on the minicomputer itself* — leads somewhere better. Atari's own development tools, long thought lost, were dumped and posted to bitsavers: a 1978–79 RT-11 toolchain whose files are still timestamped `19-SEP-78` and across that autumn. Inside is a complete MACRO-11-based 6502 cross-assembler:
 
-> **MACXX is not DASM.** Directive names, the macro syntax, and the comment character differ from the DASM dialect used throughout this book. Don't expect an `xmas.asm` to assemble unchanged — expect to port it. Translating a known-good DASM program to MACXX is, honestly, half the fun and a real test of how well you understand both the source and the assembler.
+- **`MAC65`** — the macro assembler itself (with ready-to-run RT-11 `MAC65.SAV` executables);
+- **`OPC65`** — the 6502 opcode-and-addressing-mode processor (its siblings `OPC68`/`OPC69` cover the 6800/6809);
+- **`LINKM`** the linker and **`IMGFIL`** the image splitter, plus a bootable RT-11 system disk that even bundles `ROM`/`ROMRDR` cartridge tools.
+
+`.M65` is the source extension; you assemble with `MAC65`, link with `LINKM`, and split to a flat image with `IMGFIL`. This is the genuine article — Atari's actual 6502 cross-assembler, **running natively on the (simulated) PDP-11 under RT-11**, which is precisely the workflow this page is chasing. The community has already used it to reassemble a **bit-exact arcade ROM** for the first time in forty-odd years.
+
+> **An honest detour: these are the *coin-op* tools.** Atari's arcade and consumer divisions were famously siloed, and `MAC65`/`LINKM`/`IMGFIL` are the **arcade** division's toolchain — the same *kind* of PDP-11/RT-11/6502 setup the 2600 group used, but not provably their exact binary, and not what David Crane used (his were Activision's in-house blue-box tools). No public, runnable artifact is *provably* the 2600 group's assembler. So aiming this coin-op assembler at a **2600** cartridge is a small, deliberate step off the strictly-authentic path — and, as far as I can find, **nobody does it**, which is exactly why it's worth doing: real period assembler, real period machine and OS, pointed at the home console for once.
+
+Either route, this is a **two-step toolchain, not a one-shot like DASM**: assemble each source to an object, **link** the objects, then **split** the result into a flat cartridge image. The end product is the same thing DASM's `-f3` gives you — a raw 2K or 4K binary with the 6507 **reset vectors at the very top** (`$FFFC/$FFFD` pointing at your entry label) and code based at **`$F000`**, exactly as described in [Preparing the Image]({{< relref "/docs/burning-eprom/preparing-the-image" >}}).
+
+> **Neither assembler is DASM.** Both `MAC65` and MACXX use MACRO-11-flavoured syntax — different directives, macro rules, and comment character from the DASM dialect this book teaches. Don't expect an `xmas.asm` to assemble unchanged; expect to port it. Translating a known-good DASM program is half the fun and a real test of how well you understand both the source and the assembler.
 
 ### The download → serial
 
@@ -61,7 +70,7 @@ It reads the **12 address lines** off its GPIO pins to learn which byte the 6507
 
 ### The target → a real VCS
 
-The last link is the easy one and the whole reason for the other four: a **real Atari VCS**. Plug the Pico cart into the slot, power on, and the program you assembled on a simulated 1970s minicomputer is running on genuine 1977 silicon, painting a real picture on a real television. Spot a bug, and you run the loop again — **edit in RT-11 → assemble with MACXX → download over serial → playtest** — the 1979 cycle, rebuilt on your bench.
+The last link is the easy one and the whole reason for the other four: a **real Atari VCS**. Plug the Pico cart into the slot, power on, and the program you assembled on a simulated 1970s minicomputer is running on genuine 1977 silicon, painting a real picture on a real television. Spot a bug, and you run the loop again — **edit in RT-11 → assemble with MAC65 → download over serial → playtest** — the 1979 cycle, rebuilt on your bench.
 
 ## Both chains, side by side
 
@@ -83,7 +92,7 @@ digraph bluebox {
 
   subgraph cluster_now {
     label="Today"; fontsize=11; fontcolor="#808080"; color="#808080"; style=dashed;
-    n_host [label="PiDP-11 / RT-11\n(edit + MACXX → LLF → MIXIT)", fillcolor="#cfe0f5"];
+    n_host [label="PiDP-11 / RT-11\n(edit + MAC65 → LINKM → IMGFIL)", fillcolor="#cfe0f5"];
     n_box  [label="Pico RAM cart\n(RAM-as-ROM, serial-loadable)", fillcolor="#f6e0c6"];
     n_vcs  [label="Real VCS", fillcolor="#d2efd2"];
     n_host -> n_box [label="  serial download"];
@@ -99,12 +108,15 @@ digraph bluebox {
 - **Serial is slow, and that's authentic.** Don't expect USB-stick transfer times. Streaming a 4K image down a serial link is part of the period feel; pick a baud rate you can live with for many iterations.
 - **Mind the bus timing on the cart.** The hard part of a Pico (or any MCU) cartridge is answering the bus *fast enough and at the right moment* — the 6507 won't wait for you. Budget your effort here, not on the assembler.
 - **A simple RAM cart is unbanked.** Plan for a **2K or 4K** image with no bankswitching unless you specifically add it; that's plenty for a first program and matches what the original blue box targeted.
-- **MACXX ≠ DASM.** Porting a DASM source to MACXX's dialect is real work. Start from a tiny, known-good program (a solid-color frame) so that when something breaks you know it's the toolchain, not your game.
+- **Start from a tiny, known-good program.** Porting a DASM source to the MACRO-11 dialect (`MAC65` or MACXX) is real work; begin with a solid-color frame so that when something breaks you know it's the toolchain, not your game.
+- **The MAC65 path is coin-op, repurposed.** You're using the arcade division's real assembler to build a *consumer* 2600 binary — period-correct machine, OS, and assembler, but a deliberate cross-division splice. Say so when you show it off; the honesty is part of the fun, and the novelty is real.
 
 ## Going further
 
 - **[PiDP-11](https://obsolescence.dev/pdp11)** — Oscar Vermeulen's kit: the replica PDP-11/70 panel plus the Raspberry Pi / SIMH software that boots RT-11.
-- **[MACXX](https://github.com/DaveShepperd/macxx)** — Dave Shepperd's RT-11-origin 6502 cross-assembler, with the `LLF` linker and `MIXIT` image tool; build instructions for Linux and Raspberry Pi.
+- **[Atari coin-op dev tools (`atari_tools.zip`)](http://bitsavers.org/bits/Atari/arcade/)** — bitsavers' dump of Atari's arcade-division RT-11 toolchain: `MAC65`, `OPC65`, `LINKM`, `IMGFIL`, and a bootable RT-11 system disk. The genuine, runnable period assembler — the authentic primary path above.
+- **[AtariAge — "Atari's coin-op 6502 development tools … found!"](https://forums.atariage.com/topic/360126-ataris-coin-op-6502-development-tools-for-their-pdp-11-found/)** — the community thread that surfaced and exercised those tools, including a bit-exact ROM rebuild under a PDP-11 emulator.
+- **[MACXX](https://github.com/DaveShepperd/macxx)** — Dave Shepperd's 6502 cross-assembler. The published code is his **C rewrite** (the original 1978 RT-11 assembly source isn't public); builds on Linux and Raspberry Pi as the period-lineage fallback.
 - **[Atari 2600 Program Development](https://www.atariarchives.org/dev/CGEXPO01.ppt)** — Joe Decuir's talk on the original dev rig: the PDP-11 cross-assembler, the RAM-in-code-space emulator, the debug monitor, and the HP-1600 logic analyzer.
 - **[The Blue Box: David Crane On Early Atari](https://www.gamingalexandria.com/wp/2019/05/the-blue-box-david-crane-on-early-atari-inc/)** — Crane's first-hand account of the blue box and the day-to-day workflow.
 - **[Atari 2600 Cartridge Emulation](https://emalliab.wordpress.com/2025/12/18/atari-2600-cartridge-emulation-part-2/)** — a practical write-up of using a Raspberry Pi Pico to serve the VCS bus as RAM-presented-as-ROM.
