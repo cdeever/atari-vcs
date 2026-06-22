@@ -10,6 +10,7 @@ A collection of homebrew Atari 2600 (VCS) games and experiments written in 6502 
 
 Shared headers live in a top-level **`include/`** directory — `vcs.h` (TIA/RIOT register definitions), `macro.h` (DASM helper macros like `CLEAN_START`), and `xmacro.h` (TIMER_SETUP/TIMER_WAIT timer macros). Each game references them through DASM's include path (`-I../include`), so they are a single source of truth rather than per-project copies. Each game directory holds only its own source and data.
 
+- `template/` — a reusable Combat-style game starter (`template.asm`). Provides the framework only (two BCD scores in score-mode playfield, a ~2-minute master game timer, end-of-game score blink, and GAME SELECT cycling 16 placeholder variations) with marked hooks for your own logic. Has a `Makefile`.
 - `xmas/` — a Christmas-tree playfield demo (`xmas.asm`), the most actively developed project. Has a `Makefile`.
 - `combat-src/` — work based on a disassembly of the original *Combat* cartridge (`dicombat2.asm`, ~70KB). Has a `Makefile`. (Git-ignored.)
 - `music/` — a 4-voice direct-DAC audio experiment (`wavetable.a`) that consumes 100% CPU, so it renders no video. Uses `include/xmacro.h` for its scanline timing. Has a `Makefile`.
