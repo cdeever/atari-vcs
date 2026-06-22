@@ -62,6 +62,7 @@ NUM_VARIATIONS = 16          ; how many game-select variations exist
 SCORE_COL0     = $1E         ; left score colour  (yellow)
 SCORE_COL1     = $4E         ; right score colour (a different hue)
 BACK_COL       = $00         ; play-area background colour (black)
+SCORE_BACK_COL = $00         ; steady backdrop behind the score band
 
 KL_SHOW        = $02         ; KLskip when the score IS drawn
 KL_HIDE        = $0E         ; KLskip when the score is hidden (blink off);
@@ -290,15 +291,13 @@ DrawScreen:
     lda #SCORE_COL1
     sta COLUP1                  ; right score colour
 
-    ;; Background colour. A fixed shade while a game is in progress,
-    ;; but in ATTRACT mode cycle it the way Combat cycles its colours:
-    ;; EOR the base shade with GameTimer, which free-runs ~once/second
-    ;; when no game is on. (Swap GameTimer for Clock to cycle every
-    ;; frame instead, for a faster shimmer.)
+    ;; Score-band background. In ATTRACT mode it runs the same Combat
+    ;; colour cycle as the play area below, so the whole screen switches
+    ;; colour uniformly; during play it sits steady at SCORE_BACK_COL.
     lda GameOn
     eor #$FF                    ; $00 during play, $FF in attract
     and GameTimer               ; attract -> GameTimer, play -> 0
-    eor #BACK_COL               ; fold in the fixed base shade
+    eor #SCORE_BACK_COL         ; fold in the steady base shade
     sta COLUBK
 
     ldx KLskip                  ; skip a few lines before the score
@@ -364,6 +363,18 @@ PlayArea:
     sta PF1
     sta PF2
     sta CTRLPF                  ; back to a normal playfield
+
+    ;; Play-area background. A fixed shade while a game is in progress,
+    ;; but in ATTRACT mode cycle it the way Combat cycles its colours:
+    ;; EOR the base shade with GameTimer, which free-runs ~once/second
+    ;; when no game is on. (Swap GameTimer for Clock to cycle every
+    ;; frame instead, for a faster shimmer.) The score band above keeps
+    ;; its own steady backdrop.
+    lda GameOn
+    eor #$FF                    ; $00 during play, $FF in attract
+    and GameTimer               ; attract -> GameTimer, play -> 0
+    eor #BACK_COL               ; fold in the fixed base shade
+    sta COLUBK
     ldx #PLAY_LINES
 PlayLoop:
     sta WSYNC

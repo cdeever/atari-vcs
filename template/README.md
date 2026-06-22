@@ -42,9 +42,9 @@ It assembles to a 4 KB cartridge (`org $f000`).
 
 ### Background cycling
 
-In attract mode the background colour cycles the way Combat cycles its
-colours — by EOR-ing the base shade with `GameTimer`, which free-runs about
-once per second when no game is on:
+In attract mode the **play-area** background cycles the way Combat cycles
+its colours — by EOR-ing the base shade with `GameTimer`, which free-runs
+about once per second when no game is on (the write lives in `PlayArea`):
 
 ```asm
     lda GameOn
@@ -58,11 +58,13 @@ During play the mask collapses to `0`, so the background sits steady at
 `BACK_COL`. To cycle every frame for a faster shimmer instead of Combat's
 slow once-per-second cadence, swap `GameTimer` for `Clock`.
 
-Note: this single `COLUBK` write covers the whole frame, so in attract the
-background also shifts behind the variation number at the top. The digits
-stay legible (they are drawn in the fixed score colours). If you'd rather
-keep the score band on a steady backdrop, add a second `COLUBK` write
-between the score band and the play area in the kernel.
+The kernel writes `COLUBK` twice — once for the score band, once for the
+play area — and **both** run the cycle in attract mode, so the whole screen
+switches colour uniformly. During play each collapses to its own steady
+shade: `SCORE_BACK_COL` behind the score band and `BACK_COL` below. Keep
+`SCORE_BACK_COL == BACK_COL` for a uniform attract cycle; set them
+differently only if you want the score band to have its own colour in game
+mode.
 
 ## Where to put your code — the hooks
 
@@ -131,6 +133,7 @@ Near the top of `template.asm`:
 | `NUM_VARIATIONS` | how many game-select variations exist (default 16) |
 | `SCORE_COL0` / `SCORE_COL1` | left / right score colours |
 | `BACK_COL` | play-area background colour (also the attract base shade) |
+| `SCORE_BACK_COL` | steady backdrop behind the score band |
 | `PLAY_LINES` | visible scanlines below the 14-line score band (192 − 14 = 178) |
 | `KL_SHOW` / `KL_HIDE` | score-band line skips for shown vs. blinked-off score |
 
