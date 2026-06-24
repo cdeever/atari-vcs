@@ -59,7 +59,7 @@ Each VBLANK routine is one chapter of this book at work:
 | `ROT` | builds the rotated sprite buffer for this frame | [Sprites]({{< relref "/docs/sprites" >}}) |
 | `SCROT` | converts the BCD score into score-graphics offsets | [Numbers]({{< relref "/docs/prerequisites/numbers" >}}), [Scoreboard]({{< relref "/docs/playfield/scoreboard" >}}) |
 
-`VOUT` then draws a two-line kernel: the score up top (an [asymmetric playfield]({{< relref "/docs/playfield/asymmetric" >}}) showing two different numbers by rewriting `PF1` mid-line), then the reflected maze and both tanks and missiles down the screen.
+`VOUT` then draws a two-line kernel: the score up top (an [asymmetric playfield]({{< relref "/docs/playfield/asymmetric" >}}) showing two different numbers by rewriting `PF1` mid-line), then the reflected maze and both tanks and missiles down the screen. The score trick is the kernel in miniature — for each row it packs a player's tens and ones digits into one `PF1` byte and writes it during the left half, then rebuilds the byte for the other player and rewrites the same register before the beam reaches the right half, chasing it across the line (the full mechanics are on the [Scoreboard]({{< relref "/docs/playfield/scoreboard" >}}) page).
 
 ## Three clever bits worth the price of admission
 
