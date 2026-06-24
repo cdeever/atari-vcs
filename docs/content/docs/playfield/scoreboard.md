@@ -55,7 +55,16 @@ That single `PF1` byte now shows a two-digit number on the left half of the scre
 
 ## Two scores, two sides
 
-So far that's one number, mirrored or copied onto both halves. A *scoreboard* wants the left player's score on the left and the right player's on the right — two different things — which is exactly the [asymmetric playfield]({{< relref "asymmetric" >}}): build the left score's byte and write it during the left half, then build the right score's byte and rewrite the same register before the beam reaches the right half. Six playfield writes a line, every line of the scoreboard's height, on the [cycle schedule]({{< relref "asymmetric" >}}) from the previous page. This is *why* scoreboards are the canonical asymmetric-playfield exercise.
+So far that's one number, copied onto both halves. A *scoreboard* wants the left player's score on the left and the right player's on the right — two different two-digit numbers — and that is the [asymmetric playfield]({{< relref "asymmetric" >}}) trick run against the clock.
+
+Walk one row of the score band the way the beam does:
+
+1. **Player 0.** Fetch this row of player 0's tens and ones digits, mask each to its nibble, and `ORA` them into a single byte — tens in the high nibble, ones in the low. Write that byte to `PF1` while the beam is still in the **left** half, and player 0's score appears on the left.
+2. **Player 1.** As the beam keeps moving across the *same* scanline, do it again for player 1 — fetch, mask, combine — and **rewrite that same `PF1`** before the beam reaches the **right** half, so player 1's score appears on the right.
+
+One register, written twice per line, chasing the beam from one side to the other. Each row of the scoreboard's height repeats this on the [cycle schedule]({{< relref "asymmetric" >}}) from the previous page — which is *why* scoreboards are the canonical asymmetric-playfield exercise.
+
+And the whole sequence has to land inside one scanline's [76 CPU cycles]({{< relref "/docs/tia-racing-the-beam" >}}). That budget is the reason the digit font is *pre-arranged* — each digit stored in both nibbles. Showing two digits side by side becomes an `AND` / `AND` / `ORA` of ready-made bytes — three fast instructions — instead of shifting bits into position at run time. The slow work was done once, in the shape of the table; the per-line work is only *fetch, mask, combine, store.*
 
 ## Two colors for free: score mode
 
