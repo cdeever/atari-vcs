@@ -90,44 +90,51 @@ Reset:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Main frame loop
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Cycle column convention (in the beam-timed sections below):
+;;   ; <cyc> (<total>)  -- <cyc> = cycles for this instruction,
+;;   <total> = running cycles since the last `sta WSYNC`. A WSYNC ends
+;;   the line and halts the CPU to the next line's start, so it resets
+;;   the total ("-> line"). Branches show taken/not-taken (e.g. 3/2);
+;;   totals follow the straight-line fall-through path. A scanline is
+;;   76 cycles, so a total must stay under 76 before the next WSYNC.
 StartFrame:
-    inc Clock                   ; master frame counter
+    inc Clock                   ; 5       master frame counter
 
     ;; ---- 3 lines of vertical sync ----
-    lda #$02
-    sta VSYNC
-    sta WSYNC
-    sta WSYNC
-    sta WSYNC
-    lda #$00
-    sta VSYNC
+    lda #$02                    ; 2
+    sta VSYNC                   ; 3       VSYNC on
+    sta WSYNC                   ; 3   ->  vsync line 1
+    sta WSYNC                   ; 3   ->  vsync line 2
+    sta WSYNC                   ; 3   ->  vsync line 3
+    lda #$00                    ; 2  (2)
+    sta VSYNC                   ; 3  (5)  VSYNC off
 
-    ;; ---- vertical blank: 37 lines, do game logic here ----
-    lda #$02
-    sta VBLANK
-    lda #43
-    sta TIM64T                  ; ~37 scanlines of timer
+    ;; ---- vertical blank: ~37 lines run free under the timer (no WSYNCs) ----
+    lda #$02                    ; 2  (7)
+    sta VBLANK                  ; 3  (10)
+    lda #43                     ; 2  (12)
+    sta TIM64T                  ; 4  (16) timer now counts ~37 lines
 
-    jsr Switches                ; RESET / SELECT / game-timer / blink
-    jsr GameLogic               ; <-- your per-frame play logic
-    jsr CalcScore               ; BCD scores -> graphic offsets
+    jsr Switches                ; 6 +sub  RESET / SELECT / game-timer / blink
+    jsr GameLogic               ; 6 +sub  <-- your per-frame play logic
+    jsr CalcScore               ; 6 +sub  BCD scores -> graphic offsets
 
 WaitVBlank:
-    lda INTIM
-    bne WaitVBlank
+    lda INTIM                   ; 4       poll the VBLANK timer
+    bne WaitVBlank              ; 3/2     spin until it expires
 
-    jsr DrawScreen              ; 192 visible scanlines
+    jsr DrawScreen              ; 6 +sub  192 visible scanlines
 
     ;; ---- 30 lines of overscan ----
-    lda #$02
-    sta VBLANK
-    ldx #30
+    lda #$02                    ; 2
+    sta VBLANK                  ; 3
+    ldx #30                     ; 2
 OverScan:
-    sta WSYNC
-    dex
-    bne OverScan
+    sta WSYNC                   ; 3   ->  one overscan line (x30)
+    dex                         ; 2  (2)
+    bne OverScan                ; 3/2 (4) loop back to WSYNC
 
-    jmp StartFrame
+    jmp StartFrame              ; 3       next frame
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Switches -- console logic, run once per frame during VBLANK.
@@ -280,89 +287,94 @@ CalcLoop:
 ;; its mid-line timing is what makes the trick land correctly.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 DrawScreen:
-    sta WSYNC
-    lda #$00
-    sta VBLANK                  ; end vertical blank -> picture begins
+    sta WSYNC                   ; 3   ->  end last VBLANK line (reset)
+    lda #$00                    ; 2  (2)
+    sta VBLANK                  ; 3  (5)  end vertical blank -> picture begins
 
-    lda #$02
-    sta CTRLPF                  ; score mode: left half COLUP0, right half COLUP1
-    lda #SCORE_COL0
-    sta COLUP0                  ; left score colour
-    lda #SCORE_COL1
-    sta COLUP1                  ; right score colour
+    lda #$02                    ; 2  (7)
+    sta CTRLPF                  ; 3  (10) score mode: left=COLUP0, right=COLUP1
+    lda #SCORE_COL0             ; 2  (12)
+    sta COLUP0                  ; 3  (15) left score colour
+    lda #SCORE_COL1             ; 2  (17)
+    sta COLUP1                  ; 3  (20) right score colour
 
     ;; Score-band background. In ATTRACT mode it runs the same Combat
     ;; colour cycle as the play area below, so the whole screen switches
     ;; colour uniformly; during play it sits steady at SCORE_BACK_COL.
-    lda GameOn
-    eor #$FF                    ; $00 during play, $FF in attract
-    and GameTimer               ; attract -> GameTimer, play -> 0
-    eor #SCORE_BACK_COL         ; fold in the steady base shade
-    sta COLUBK
+    lda GameOn                  ; 3  (23)
+    eor #$FF                    ; 2  (25) $00 during play, $FF in attract
+    and GameTimer               ; 3  (28) attract -> GameTimer, play -> 0
+    eor #SCORE_BACK_COL         ; 2  (30) fold in the steady base shade
+    sta COLUBK                  ; 3  (33)
 
-    ldx KLskip                  ; skip a few lines before the score
+    ldx KLskip                  ; 3  (36) skip a few lines before the score
 SkipTop:
-    sta WSYNC
-    dex
-    bne SkipTop
+    sta WSYNC                   ; 3   ->  skip line (x KLskip, reset)
+    dex                         ; 2  (2)
+    bne SkipTop                 ; 3/2 (4) loop, or fall through
 
-    lda KLskip
-    cmp #KL_HIDE                ; score hidden this frame (blink off)?
-    beq PlayArea
+    lda KLskip                  ; 3  (7)
+    cmp #KL_HIDE                ; 2  (9)  score hidden this frame (blink off)?
+    beq PlayArea                ; 3/2     taken when hidden (+1 page cross)
 
     ;; ---- draw the two scores (5 rows, 2 scanlines each) ----
-    ldx #$05                    ; score is five bytes tall
-    lda #$00
-    sta Numg0                   ; first pass draws blanks; real graphics
-    sta Numg1                   ; are computed one line ahead
+    ;; (still on the line after the skips; beq above fell through at 11)
+    ldx #$05                    ; 2  (13) score is five bytes tall
+    lda #$00                    ; 2  (15)
+    sta Numg0                   ; 3  (18) first pass draws blanks; real
+    sta Numg1                   ; 3  (21) graphics are computed one line ahead
 ScoreLoop:
-    sta WSYNC
-    lda Numg0
-    sta PF1                     ; recycle last line's left score
-    ldy ScrOff+2
-    lda Numbers,y               ; P0 tens digit (left 4 px)
-    and #$F0
-    sta Numg0
-    ldy ScrOff
-    lda Numbers,y               ; P0 ones digit (right 4 px)
-    and #$0F
-    ora Numg0
-    sta Numg0                   ; left score for next line is ready
-    lda Numg1
-    sta PF1                     ; recycle last line's right score
-    ldy ScrOff+3
-    lda Numbers,y               ; P1 tens digit
-    and #$F0
-    sta Numg1
-    ldy ScrOff+1
-    lda Numbers,y               ; P1 ones digit
-    and #$0F
-    sta WSYNC                   ; *** cycle-counted second line ***
-    ora Numg1                   ; (0)  finish right score
-    sta Numg1                   ; (3)
-    lda Numg0                   ; (6)
-    sta PF1                     ; (9)  left score lands in left half
-    dex                         ; (12)
-    bmi PlayArea                ; (14) done with all five rows
-    inc ScrOff                  ; (16) advance every offset to the next
-    inc ScrOff+2                ;      graphics row
-    inc ScrOff+1
-    inc ScrOff+3
-    lda Numg1
-    sta PF1                     ; right score lands in right half
-    jmp ScoreLoop
+    sta WSYNC                   ; 3   ->  row line A (reset)
+    lda Numg0                   ; 3  (3)
+    sta PF1                     ; 3  (6)  recycle last line's left score
+    ldy ScrOff+2                ; 3  (9)
+    lda Numbers,y               ; 4  (13) P0 tens digit (left 4 px)
+    and #$F0                    ; 2  (15)
+    sta Numg0                   ; 3  (18)
+    ldy ScrOff                  ; 3  (21)
+    lda Numbers,y               ; 4  (25) P0 ones digit (right 4 px)
+    and #$0F                    ; 2  (27)
+    ora Numg0                   ; 3  (30)
+    sta Numg0                   ; 3  (33) left score ready for next line
+    lda Numg1                   ; 3  (36)
+    sta PF1                     ; 3  (39) recycle last line's right score
+    ldy ScrOff+3                ; 3  (42)
+    lda Numbers,y               ; 4  (46) P1 tens digit
+    and #$F0                    ; 2  (48)
+    sta Numg1                   ; 3  (51)
+    ldy ScrOff+1                ; 3  (54)
+    lda Numbers,y               ; 4  (58) P1 ones digit
+    and #$0F                    ; 2  (60)
+    sta WSYNC                   ; 3   ->  row line B (reset); 60 used above
+    ora Numg1                   ; 3  (3)  finish right score
+    sta Numg1                   ; 3  (6)
+    lda Numg0                   ; 3  (9)
+    sta PF1                     ; 3  (12) left score lands in left half
+    dex                         ; 2  (14)
+    bmi PlayArea                ; 3/2 (16) taken on last row -> PlayArea
+    inc ScrOff                  ; 5  (21) advance every offset to the
+    inc ScrOff+2                ; 5  (26) next graphics row
+    inc ScrOff+1                ; 5  (31)
+    inc ScrOff+3                ; 5  (36)
+    lda Numg1                   ; 3  (39)
+    sta PF1                     ; 3  (42) right score lands in right half
+    jmp ScoreLoop               ; 3  (45) -> top WSYNC ends row line B
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PlayArea -- the rest of the visible frame below the score.
 ;; This is just a blank, coloured field. Replace it with your own
 ;; kernel (players, missiles, playfield, etc.).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; Totals below assume entry from the score loop's bmi (last row),
+    ;; which lands here at ~17 cycles into the line. The setup finishes
+    ;; well before the first PlayLoop WSYNC. (The score-hidden beq path
+    ;; enters a little earlier; either way it fits in one line.)
 PlayArea:
-    lda #$00
-    sta PF0
-    sta PF1
-    sta PF2
-    sta CTRLPF                  ; back to a normal playfield
+    lda #$00                    ; 2  (19)
+    sta PF0                     ; 3  (22)
+    sta PF1                     ; 3  (25)
+    sta PF2                     ; 3  (28)
+    sta CTRLPF                  ; 3  (31) back to a normal playfield
 
     ;; Play-area background. A fixed shade while a game is in progress,
     ;; but in ATTRACT mode cycle it the way Combat cycles its colours:
@@ -370,18 +382,18 @@ PlayArea:
     ;; when no game is on. (Swap GameTimer for Clock to cycle every
     ;; frame instead, for a faster shimmer.) The score band above keeps
     ;; its own steady backdrop.
-    lda GameOn
-    eor #$FF                    ; $00 during play, $FF in attract
-    and GameTimer               ; attract -> GameTimer, play -> 0
-    eor #BACK_COL               ; fold in the fixed base shade
-    sta COLUBK
-    ldx #PLAY_LINES
+    lda GameOn                  ; 3  (34)
+    eor #$FF                    ; 2  (36) $00 during play, $FF in attract
+    and GameTimer               ; 3  (39) attract -> GameTimer, play -> 0
+    eor #BACK_COL               ; 2  (41) fold in the fixed base shade
+    sta COLUBK                  ; 3  (44)
+    ldx #PLAY_LINES             ; 2  (46)
 PlayLoop:
-    sta WSYNC
+    sta WSYNC                   ; 3   ->  one play line (x PLAY_LINES, reset)
     ;; --- draw one scanline of your game here ---
-    dex
-    bne PlayLoop
-    rts
+    dex                         ; 2  (2)
+    bne PlayLoop                ; 3/2 (4) loop back to WSYNC
+    rts                         ; 6       back to the frame loop (overscan)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Numbers -- digit graphics, 0..9, five bytes each. Each byte holds
