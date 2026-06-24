@@ -34,6 +34,8 @@ The ultimate front-loading is doing the work at *assembly* time. Any value you c
 
 This is the [Numbers & Arithmetic]({{< relref "/docs/prerequisites/numbers" >}}) habit at kernel scale: with no multiply instruction and no spare cycles, you precompute multiplication tables, sine/cosine for motion, the [note→`AUDF` table]({{< relref "/docs/sound/tones-noise-and-pitch" >}}), the [×5 digit offsets]({{< relref "/docs/playfield/scoreboard" >}}), and sprite-row pointers — then *read* the answer. [ROM]({{< relref "/docs/architecture/rom" >}}) is measured in kilobytes; cycles and [RAM]({{< relref "/docs/architecture/riot" >}}) are desperately scarce. Spend the plentiful resource.
 
+And it isn't only *values* you precompute — sometimes it's *layout.* The [scoreboard's digit font]({{< relref "/docs/playfield/scoreboard" >}}) stores each digit's shape redundantly in *both* nibbles of every byte, so the kernel merges two digits into one `PF1` byte with a single `ORA` instead of shifting bits into place. The digit graphics are intentionally **denormalized** in ROM so the score kernel can trade a small amount of storage for faster execution during the 76-cycle scanline deadline.
+
 ## Page-align the hot tables
 
 There's a sharp edge here, and it's the [page-crossing penalty]({{< relref "/docs/6502-basics/addressing-modes" >}}): an indexed read whose address crosses a 256-byte boundary silently costs **+1 cycle** — and in a kernel counting to 76, one stray cycle tears the picture. The fix is to **align a time-critical table to a page boundary** so the index can never cross it:
