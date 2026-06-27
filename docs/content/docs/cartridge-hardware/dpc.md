@@ -5,7 +5,7 @@ weight: 30
 
 # The DPC: A Chip on the Cartridge
 
-[Bankswitching]({{< relref "bankswitching" >}}) adds ROM and the [Superchip]({{< relref "extra-ram" >}}) adds RAM, but both are still just *memory* — passive storage the CPU does all the work against. *Pitfall II: Lost Caverns* (1984) took the idea to its conclusion: **David Crane** designed a custom chip, the **DPC** (Display Processor Chip), and built it into the cartridge. It was the first — and in the commercial 2600 era, essentially the only — game cartridge with a coprocessor of its own. The console did nothing new; the cart did the new thing.
+[Bankswitching]({{< relref "bankswitching" >}}) adds ROM and the [Superchip]({{< relref "extra-ram" >}}) adds RAM, but both are still just *memory* — passive storage the CPU does all the work against. *Pitfall II: Lost Caverns* (1984) took the idea to its conclusion: **David Crane** designed a custom chip, the **DPC** — officially the *Display Processor Chip*, though the initials are also his own (David Patrick Crane) — and built it into the cartridge. It was the first — and in the commercial 2600 era, essentially the only — game cartridge with a coprocessor of its own. The console did nothing new; the cart did the new thing.
 
 ## Data fetchers: streaming graphics without the CPU
 
