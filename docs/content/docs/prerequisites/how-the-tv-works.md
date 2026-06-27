@@ -16,7 +16,7 @@ A CRT television draws its image with a single **electron beam** that sweeps acr
 3. It repeats line by line down the screen until it reaches the bottom.
 4. Then it switches off and snaps back up to the top-left to begin the next image. This return is the **vertical blank** (VBLANK).
 
-The whole top-to-bottom pass is one **frame**. The beam never stops moving; your only control over the picture is *what the beam is told to output at each instant as it travels.*
+The whole top-to-bottom pass is one **frame**. The set repaints the entire frame about **60 times a second**, far faster than the eye can follow — so by **persistence of vision**, the glowing phosphors and the rapid succession of frames fuse into one steady, full-motion picture, even though the beam is only ever lighting a single point at a time.
 
 ## Sync tells the TV where the beam should be
 
