@@ -12,9 +12,9 @@ Before the VCS makes sense, the *television* has to. Every concept in this book 
 A CRT television draws its image with a single **electron beam** that sweeps across the screen from behind. It moves in a fixed pattern:
 
 1. Starting at the top-left, it sweeps **left to right**, lighting the phosphors as it goes — that's one **scanline**.
-2. At the right edge it switches off and snaps back to the left, ready for the next line down. This return trip is the **horizontal blank** (HBLANK); nothing is drawn during it.
+2. At the right edge it switches off and snaps back to the left, ready for the next line down. This return trip is the **horizontal blank**; nothing is drawn during it.
 3. It repeats line by line down the screen until it reaches the bottom.
-4. Then it switches off and snaps back up to the top-left to begin the next image. This return is the **vertical blank** (VBLANK).
+4. Then it switches off and snaps back up to the top-left to begin the next image. This return is the **vertical blank**.
 
 The whole top-to-bottom pass is one **frame**. The set repaints the entire frame about **60 times a second**, far faster than the eye can follow — so by **persistence of vision**, the glowing phosphors and the rapid succession of frames fuse into one steady, full-motion picture, even though the beam is only ever lighting a single point at a time.
 
@@ -52,23 +52,23 @@ You've watched the beam march down the frame one line at a time. Now zoom in on 
 
 A **color clock** is the smallest unit of horizontal timing on the signal — the finest grain at which the picture can change as the beam crosses the line, ticking at the TV's color reference rate (about 3.58 million times a second on NTSC).
 
-A full scanline is **228 color clocks** wide, but not all of it is picture. About **160** carry the visible image; the other **68** are spent on the **horizontal blank** — the beam switched off, snapping back to the left for the next line (the HBLANK from earlier). So the horizontal "canvas" a single line offers is only about **160 steps** wide. There's no pixel grid and no resolution dial: how much horizontal detail you get is simply how finely those ~160 visible clocks are divided up.
+A full scanline is **228 color clocks** wide, but not all of it is picture. About **160** carry the visible image; the other **68** are spent on the **horizontal blank** — the beam switched off, snapping back to the left for the next line (the horizontal blank from earlier). So the horizontal "canvas" a single line offers is only about **160 steps** wide. There's no pixel grid and no resolution dial: how much horizontal detail you get is simply how finely those ~160 visible clocks are divided up.
 
-## Frames per second, and the two standards
+## Frames per second, and the three standards
 
-A TV redraws the whole frame many times a second to produce a steady image. How many — and how many scanlines make up a frame — depends on the regional broadcast standard the set was built for. Two dominate, with a third worth naming:
+A TV redraws the whole frame many times a second to produce a steady image. How many — and how many scanlines make up a frame — depends on the regional broadcast standard the set was built for. Three of them divided up the world:
 
-| | **NTSC** | **PAL** |
-|---|---|---|
-| Where | North America, Japan | much of Europe, Australia |
-| Refresh rate | ~60 frames/sec | ~50 frames/sec |
-| Scanlines per frame | **262** | **312** |
-| Active (visible) lines | ~240 | ~288 |
-| Color clocks per line | 228 (~160 visible) | 228 (~160 visible) |
+| | **NTSC** | **PAL** | **SECAM** |
+|---|---|---|---|
+| Where | North America, Japan | much of Europe, Australia | France, former Soviet bloc, parts of Africa & the Middle East |
+| Refresh rate | ~60 frames/sec | ~50 frames/sec | ~50 frames/sec |
+| Scanlines per frame | **262** | **312** | **312** |
+| Active (visible) lines | ~240 | ~288 | ~288 |
+| Color clocks per line | 228 (~160 visible) | 228 (~160 visible) | 228 (~160 visible) |
 
-Both standards build a line the same way — the **228 color clocks** from the previous section — so a single scanline takes exactly as long on either. What differs is the **number of lines** in a frame and the **refresh rate**: a PAL frame is taller (more scanlines) and arrives more slowly. And because the picture is only ever as tall as the **visible scanlines** drawn between the blanking margins, that line count *is* the vertical dimension — there's no separate vertical-resolution setting, just lines, and they must total the standard's count (262 for NTSC) or the set loses sync. PAL and NTSC also encode color completely differently, so the same color value shows as a different hue on each.
+All three build a line the same way — the **228 color clocks** from the previous section — so a single scanline takes exactly as long on any of them. What differs is the **number of lines** in a frame and the **refresh rate**: the 50 Hz standards, PAL and SECAM, draw taller frames that arrive more slowly. And because the picture is only ever as tall as the **visible scanlines** drawn between the blanking margins, that line count *is* the vertical dimension — there's no separate vertical-resolution setting, just lines, and they must total the standard's count (262 for NTSC) or the set loses sync.
 
-A third standard, **SECAM** (France, the former Soviet bloc, and parts of Africa and the Middle East), shares PAL's taller 50 Hz frame but encodes color differently again. It rarely enters into VCS work, so it's named here only for completeness — **this book targets NTSC throughout.**
+The sharpest difference is color: NTSC, PAL, and SECAM each encode it a completely different way, so the same color value shows as a different hue on each. SECAM in particular rarely enters into VCS work and is named here mostly for completeness — **this book targets NTSC throughout.**
 
 So a television has no fixed resolution to dial in — its picture size simply *emerges* from the signal's timing: the width from how many color clocks a line spends on picture, the height from how many of the standard's lines it lights. How a VCS program decides those things — filling that width, choosing those lines — is the craft picked up in the [Playfield]({{< relref "/docs/playfield" >}}) and [Sprites]({{< relref "/docs/sprites" >}}) chapters. That's the mental shift this whole chapter is preparing you for: there is no buffer and no resolution dial — only a beam, a clock, and a signal deciding what to show at each tick.
 
