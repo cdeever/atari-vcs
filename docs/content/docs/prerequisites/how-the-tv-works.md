@@ -22,7 +22,7 @@ The whole top-to-bottom pass is one **frame**. The set repaints the entire frame
 
 On its own, a television can't hold a perfectly stable picture. Inside the set are electronic timing circuits that drive the electron beam horizontally across the screen and then back to the top for the next frame. Those circuits are built to run at almost exactly the right speed — but "almost" isn't good enough. Like any analog oscillator, they slowly drift.
 
-To understand why, imagine a runner trying to maintain an **8:00-minute-per-mile pace** with nothing — and no one — to help them hold it. A skilled runner might stay close for a while, but over the course of several miles they'll gradually speed up or slow down. Now imagine another runner — the official pacer — running exactly 8:00 pace. Every few seconds our runner glances over, notices they're a step ahead or behind, and makes a tiny correction. Most of the time the adjustment is so small you wouldn't even notice it.
+To understand why, imagine a runner trying to maintain an 8:00-minute-per-mile pace with nothing — and no one — to help them hold it. A skilled runner might stay close for a while, but over the course of several miles they'll gradually speed up or slow down. Now imagine another runner — the official pacer — running exactly 8:00 pace. Every few seconds our runner glances over, notices they're a step ahead or behind, and makes a tiny correction. Most of the time the adjustment is so small you wouldn't even notice it.
 
 A television works much the same way. It already knows roughly how fast to sweep the beam across the screen, but it constantly needs tiny corrections to keep the picture perfectly aligned. Those corrections come from **sync pulses** embedded in the video signal.
 
