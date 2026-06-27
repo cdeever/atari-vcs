@@ -454,13 +454,13 @@
     ];
     var WSYNC = { text: "sta WSYNC", cyc: 3, note: "end the line", wsync: true };
     var LIMIT = 76;        // cycles of work per visible line
-    var SCALE_MAX = 96;    // bar runs past the deadline so overrun is visible
+    var SCALE_MAX = 100;   // bar runs past the deadline so overrun is visible
 
     return {
       duration: 6,
       height: 340,
       controls: [
-        { id: "extra", label: "Extra work (cyc)", min: 0, max: 64, step: 1, value: 0 },
+        { id: "extra", label: "Extra work (cyc)", min: 0, max: 80, step: 1, value: 0 },
       ],
       draw: function (ctx, t, p) {
         var c = api.colors;
@@ -500,60 +500,44 @@
         ctx.fillRect(0, 0, W, H);
         var pad = 16;
 
-        // --- Budget bar (the hero) -----------------------------------------
+        // total cost of the line, and its green→amber→red status
+        var totalColor = overran ? bad : (workTotal >= LIMIT * 0.8 ? warn : ok);
+
+        // --- Title + headline total (tracks the slider) --------------------
         ctx.fillStyle = c.muted;
         ctx.font = "12px system-ui, sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "alphabetic";
-        ctx.fillText("Cycle budget — one visible line is 76 cycles", pad, 26);
+        ctx.fillText("Cycle budget — one visible line is 76 cycles", pad, 22);
 
-        var barX = pad, barY = 40, barW = W - pad * 2, barH = 30;
-        // track
+        ctx.font = "bold 15px system-ui, sans-serif";
+        ctx.fillStyle = totalColor;
+        ctx.fillText(workTotal + " / 76 cyc", pad, 43);
+        ctx.font = "bold 12px system-ui, sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(overran ? ("OVERRUN by " + (workTotal - LIMIT) + " — the line tears")
+                             : ((LIMIT - workTotal) + " cycles to spare"), W - pad, 43);
+
+        // --- Budget bar: faded total extent + bright executed-so-far -------
+        var barX = pad, barY = 52, barW = W - pad * 2, barH = 28;
         ctx.fillStyle = c.card;
         ctx.fillRect(barX, barY, barW, barH);
         ctx.strokeStyle = c.border;
         ctx.strokeRect(barX + 0.5, barY + 0.5, barW - 1, barH - 1);
-        // fill
-        var ratio = shownWork / LIMIT;
-        var fillColor = ratio >= 1 ? bad : (ratio >= 0.8 ? warn : ok);
-        var fillW = Math.min(shownWork / SCALE_MAX, 1) * barW;
-        ctx.fillStyle = fillColor;
-        ctx.globalAlpha = 0.85;
-        ctx.fillRect(barX, barY, fillW, barH);
+        var totalW = Math.min(workTotal / SCALE_MAX, 1) * barW;
+        ctx.fillStyle = totalColor; ctx.globalAlpha = 0.3;       // whole line's cost
+        ctx.fillRect(barX, barY, totalW, barH);
+        var runW = Math.min(shownWork / SCALE_MAX, 1) * barW;
+        ctx.globalAlpha = 0.9;                                   // executed so far
+        ctx.fillRect(barX, barY, runW, barH);
         ctx.globalAlpha = 1;
         // 76-cycle deadline marker
         var deadX = barX + (LIMIT / SCALE_MAX) * barW;
-        ctx.strokeStyle = bad;
-        ctx.setLineDash([4, 3]);
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(deadX, barY - 4);
-        ctx.lineTo(deadX, barY + barH + 4);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.lineWidth = 1;
-        ctx.fillStyle = bad;
-        ctx.font = "bold 11px system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("76", deadX, barY + barH + 16);
-        // live count
-        ctx.fillStyle = fillColor;
-        ctx.font = "bold 13px system-ui, sans-serif";
-        ctx.textAlign = "left";
-        ctx.fillText(Math.round(shownWork) + " cyc", barX + 4, barY - 6);
-
-        // --- Verdict (shown once the cursor reaches WSYNC) -----------------
-        if (atWsync) {
-          ctx.textAlign = "right";
-          ctx.font = "bold 13px system-ui, sans-serif";
-          if (overran) {
-            ctx.fillStyle = bad;
-            ctx.fillText("OVERRUN by " + (workTotal - LIMIT) + " — line tears", barX + barW, barY - 6);
-          } else {
-            ctx.fillStyle = ok;
-            ctx.fillText((LIMIT - workTotal) + " cycles to spare", barX + barW, barY - 6);
-          }
-        }
+        ctx.strokeStyle = bad; ctx.setLineDash([4, 3]); ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(deadX, barY - 5); ctx.lineTo(deadX, barY + barH + 5); ctx.stroke();
+        ctx.setLineDash([]); ctx.lineWidth = 1;
+        ctx.fillStyle = bad; ctx.font = "bold 11px system-ui, sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("76", deadX, barY + barH + 15);
 
         // --- Lower split: instruction list (left) + mini screen (right) ----
         var listX = pad, listY = barY + barH + 36;
@@ -584,36 +568,48 @@
           if (!ins.wsync) running += ins.cyc;
         }
 
-        // mini "screen": stable lines vs. a torn picture
+        // mini "screen": a stick figure — clean & green when the line fits,
+        // distorted & red when it overruns
         var scrX = rightX, scrY = listY - 14;
         var scrW = rightW, scrH = seq.length * rowH - 8;
         ctx.fillStyle = c.dark ? "#000" : "#0a0f0a";
         ctx.fillRect(scrX, scrY, scrW, scrH);
         ctx.strokeStyle = c.muted;
         ctx.strokeRect(scrX + 0.5, scrY + 0.5, scrW - 1, scrH - 1);
-        var lines = 7, lh = scrH / (lines + 1);
-        for (var L = 1; L <= lines; L++) {
-          var ly = scrY + L * lh;
-          var off = 0;
-          if (overran) {
-            // progressively larger horizontal shift = tear/roll
-            off = ((L * (workTotal - LIMIT)) % (scrW * 0.5));
-          }
-          ctx.strokeStyle = overran ? bad : ok;
-          ctx.globalAlpha = overran ? 0.9 : 0.8;
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(scrX + 6 + off, ly);
-          ctx.lineTo(scrX + scrW - 6, ly);
-          if (overran) { // wrap the torn remainder to the left edge
-            ctx.moveTo(scrX + 6, ly);
-            ctx.lineTo(scrX + 6 + off, ly);
-          }
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }
-        ctx.lineWidth = 1;
-        ctx.fillStyle = c.muted;
+
+        var sev = overran ? Math.min((workTotal - LIMIT) / 21, 1) : 0; // distortion 0..1
+        var TAU = Math.PI * 2;
+        function wob(ph, f) { return Math.sin(t * TAU * f + ph); }     // animates on play
+        var amp = scrW * 0.18 * sev;
+        function jx(ph) { return amp * wob(ph, 1.7); }
+        function jy(ph) { return amp * 0.6 * wob(ph + 1.1, 2.3); }
+
+        var fcx = scrX + scrW / 2;
+        var fTop = scrY + scrH * 0.14, fBot = scrY + scrH * 0.9, u = scrH * 0.76, hr = u * 0.13;
+        var head = { x: fcx + jx(0),   y: fTop + hr + jy(0.4) };
+        var neck = { x: fcx + jx(0.8), y: fTop + 2 * hr + u * 0.03 };
+        var hip  = { x: fcx + jx(1.6), y: neck.y + u * 0.34 };
+        var sh   = { x: (neck.x + hip.x) / 2, y: neck.y + u * 0.06 };
+        var lh   = { x: fcx - scrW * 0.17 + jx(2.4), y: sh.y + u * 0.12 + jy(2.4) };
+        var rh   = { x: fcx + scrW * 0.17 + jx(3.2), y: sh.y + u * 0.12 + jy(3.2) };
+        var lf   = { x: hip.x - scrW * 0.11 + jx(4.0), y: fBot + jy(4.0) };
+        var rf   = { x: hip.x + scrW * 0.11 + jx(4.8), y: fBot + jy(4.8) };
+
+        ctx.save();
+        ctx.beginPath(); ctx.rect(scrX, scrY, scrW, scrH); ctx.clip();
+        ctx.strokeStyle = totalColor; ctx.lineWidth = 2.5; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.arc(head.x, head.y, hr, 0, TAU); ctx.stroke();       // head
+        ctx.beginPath();
+        ctx.moveTo(neck.x, neck.y); ctx.lineTo(hip.x, hip.y);                     // spine
+        ctx.moveTo(sh.x, sh.y); ctx.lineTo(lh.x, lh.y);                           // arms
+        ctx.moveTo(sh.x, sh.y); ctx.lineTo(rh.x, rh.y);
+        ctx.moveTo(hip.x, hip.y); ctx.lineTo(lf.x, lf.y);                         // legs
+        ctx.moveTo(hip.x, hip.y); ctx.lineTo(rf.x, rf.y);
+        ctx.stroke();
+        ctx.restore();
+        ctx.lineWidth = 1; ctx.lineCap = "butt";
+
+        ctx.fillStyle = totalColor;
         ctx.font = "10px system-ui, sans-serif";
         ctx.textAlign = "center";
         ctx.fillText(overran ? "picture tears" : "stable picture", scrX + scrW / 2, scrY + scrH + 14);

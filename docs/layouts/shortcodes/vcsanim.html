@@ -1,5 +1,7 @@
 {{ if not (.Page.Scratch.Get "vcsanim") }}
-<script src="{{ "js/vcs-anim.js" | relURL }}" defer></script>
+{{ with resources.Get "js/vcs-anim.js" }}
+<script src="{{ (. | fingerprint).RelPermalink }}" defer></script>
+{{ end }}
 {{ .Page.Scratch.Set "vcsanim" true }}
 {{ end }}
 
