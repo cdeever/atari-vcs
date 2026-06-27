@@ -65,6 +65,8 @@ Read it as a relay: get `PF0`'s left value in before cycle 18, then `PF1`'s befo
 
 *(These figures come from the playfield timing diagram Andrew Davie published on the AtariAge forums — the reference kernel authors keep close at hand.)*
 
+{{< vcsanim scene="asymmetric-pf" caption="The CPU runs ahead of the beam: it writes PF0/PF1/PF2 in HBLANK for the left half, then rewrites all three in the gap before the seam, so the two halves differ. Watch the cycle count stay well under 76." >}}
+
 ## Mixing symmetric and asymmetric bands
 
 You don't have to choose one mode for the whole screen. Both the playfield registers and `CTRLPF` are just memory, rewritten line by line, so a single frame can freely **combine symmetric and asymmetric regions** down its height:

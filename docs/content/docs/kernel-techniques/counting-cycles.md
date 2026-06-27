@@ -22,6 +22,8 @@ KernelLine:
     bne KernelLine      ; 3   loop  → 23 cycles, comfortably under 76
 ```
 
+{{< vcsanim scene="cycle-budget" caption="The bar fills as each instruction spends its cycles. Drag *Extra work* until the kernel crosses the 76-cycle deadline and the picture tears." >}}
+
 The point isn't this exact line — it's the *practice* of tallying the right-hand column as you write, so you always know how much room is left before the beam runs out.
 
 ## Leave margin

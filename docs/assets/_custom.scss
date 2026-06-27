@@ -108,6 +108,75 @@
 }
 
 // -----------------------------------------------------------------------------
+// Interactive canvas animations (vcs-anim.js)
+// -----------------------------------------------------------------------------
+
+.vcs-anim-figure {
+  margin: 1.5rem 0;
+  text-align: center;
+
+  figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+}
+
+.vcs-anim {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  padding: 0.75rem;
+  overflow: hidden;
+
+  .vcs-anim-canvas {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+.vcs-anim-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.vcs-anim-play {
+  border: 1px solid var(--accent-color);
+  background: var(--accent-color);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover { background: var(--accent-dark); }
+}
+
+.vcs-anim-slider {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  span { white-space: nowrap; }
+  input[type="range"] {
+    accent-color: var(--accent-color);
+    cursor: pointer;
+    max-width: 140px;
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Green-screen code frames (retro phosphor terminal)
 // -----------------------------------------------------------------------------
 

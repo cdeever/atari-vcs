@@ -1,0 +1,11 @@
+{{ if not (.Page.Scratch.Get "vcsanim") }}
+<script src="{{ "js/vcs-anim.js" | relURL }}" defer></script>
+{{ .Page.Scratch.Set "vcsanim" true }}
+{{ end }}
+
+<figure class="vcs-anim-figure">
+  <div class="vcs-anim"
+       data-scene="{{ .Get "scene" }}"
+       {{ with .Get "height" }}data-height="{{ . }}"{{ end }}></div>
+  {{ with .Get "caption" }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
+</figure>

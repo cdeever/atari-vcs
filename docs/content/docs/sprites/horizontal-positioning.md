@@ -33,6 +33,8 @@ The gap between those coarse landing spots is closed by the **fine-motion** regi
 
 So the full move is two steps: strobe `RESP0` to the nearest coarse slot, set `HMP0` to the leftover distance, then `STA HMOVE` to slide the sprite the final few pixels. The classic routine computes both at once — a divide-by-15 of the target column gives the coarse strobe timing, and the remainder becomes the `HMP0` fine value.
 
+{{< vcsanim scene="resp0-hmove" caption="Move *Strobe cycle* and the sprite snaps to the nearest coarse slot; then *HMP0* nudges it the last few clocks (positive = left). Any nudge lights up the HMOVE comb at the left edge." >}}
+
 > **The sign is the single most-flipped detail in VCS programming.** By the usual convention a *positive* `HMxx` value moves the object **left** and a *negative* value moves it **right** (`$70` = +7 left, `$80` = −8 right). It's worth confirming the direction against your `vcs.h` constants and watching it in Stella rather than trusting memory.
 
 ## The HMOVE comb, and clearing

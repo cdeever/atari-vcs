@@ -38,6 +38,8 @@ If the sync was weak, mistimed, or missing — a fading antenna, a worn videotap
 
 Older sets handed the viewer direct control over those very oscillators, as two knobs usually on the back or side: **Vertical Hold** and **Horizontal Hold**. Each nudged the free-running frequency of one oscillator up or down. When the picture rolled, you turned Vertical Hold until the frame caught and snapped still; when it tore or skewed, Horizontal Hold did the same. You were, quite literally, hand-tuning the runner's natural pace until it fell back into step with the beat in the signal.
 
+{{< vcsanim scene="crt-scan" caption="The beam scans line by line, refreshing a test pattern. Detune *Vertical Hold* and the frame rolls; detune *Horizontal Hold* and it tears. Center both to re-lock — just like the back-panel knobs." >}}
+
 That is the medium the VCS must satisfy. Generating those sync pulses at exactly the right moments — so the television never has a reason to roll or tear in the first place — is the job of the console's video chip and your program, taken up in [The Video & Sound Chip (TIA)]({{< relref "/docs/architecture/programming-the-television" >}}) and [The Frame Structure]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}).
 
 ## Frames per second, and the two standards

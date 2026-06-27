@@ -14,6 +14,8 @@ The TIA produces no picture on its own — your code defines the frame by toggli
 | Visible | 192 | The kernel. Everything the player sees is drawn here, one line at a time. |
 | Overscan | 30 | Bottom blanking. Read input and collisions, update state. |
 
+{{< vcsanim scene="beam" caption="The beam paints 262 lines top-to-bottom; only the 192 visible lines carry picture. Press play, then scrub to freeze any moment." >}}
+
 ## Vertical sync
 
 A frame begins by turning on `VBLANK` and `VSYNC`, then holding `VSYNC` for exactly three scanlines:
@@ -51,7 +53,7 @@ Hold `VBLANK` for the 37 blanking lines. In a real game this is where you'd run 
 
 ## The visible kernel
 
-The 192 visible lines are where drawing happens. Whatever you write to TIA registers (`COLUBK`, `PF0`/`PF1`/`PF2`, the sprite registers) takes effect as the beam paints that line. In `xmas.asm` the kernel rewrites the playfield registers in blocks to grow a tree shape down the screen — see the [Christmas Tree walkthrough]({{< relref "/docs/projects/xmas-tree" >}}). The line counts of all the blocks must sum to 192.
+The 192 visible lines are where drawing happens. Whatever you write to TIA registers (`COLUBK`, `PF0`/`PF1`/`PF2`, the sprite registers) takes effect as the beam paints that line. In `xmas.asm` the kernel rewrites the playfield registers in blocks to grow a tree shape down the screen — see the [Christmas Tree walkthrough](https://github.com/cdeever/atari-vcs/blob/main/xmas/README.md). The line counts of all the blocks must sum to 192.
 
 ## Overscan
 

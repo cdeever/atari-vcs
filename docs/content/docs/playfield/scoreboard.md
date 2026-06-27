@@ -64,6 +64,8 @@ Walk one row of the score band the way the beam does:
 
 One register, written twice per line, chasing the beam from one side to the other. Each row of the scoreboard's height repeats this on the [cycle schedule]({{< relref "asymmetric" >}}) from the previous page — which is *why* scoreboards are the canonical asymmetric-playfield exercise.
 
+{{< vcsanim scene="scoreboard" caption="Watch the beam build the band row by row: PF1 loads player 0's digits for the left half, then is rewritten with player 1's before the seam. Score mode colors each half. Drag the sliders to set either score." >}}
+
 And the whole sequence has to land inside one scanline's [76 CPU cycles]({{< relref "/docs/tia-racing-the-beam" >}}). That budget is the reason the digit font is *pre-arranged* — each digit stored in both nibbles. Showing two digits side by side becomes an `AND` / `AND` / `ORA` of ready-made bytes — three fast instructions — instead of shifting bits into position at run time. The slow work was done once, in the shape of the table; the per-line work is only *fetch, mask, combine, store.*
 
 ## Two colors for free: score mode
