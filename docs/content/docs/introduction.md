@@ -29,15 +29,9 @@ What does that unlearning look like? Underneath, the whole Atari is just **four 
 
 Take that less as a warning than as an invitation. Stripped of the abstractions, you get to see exactly what the machine is doing on every cycle — and that directness is the whole appeal.
 
-## The job is to generate a television signal
-
-So what *is* the work? At its core, programming the VCS means writing software that **generates a television signal in real time** — and does it while simultaneously reading the joystick and responding to the player. There is no frame buffer to quietly draw into and hand off; your code and the electron beam travel down the screen together, in lockstep. Because of that, the *shape* of a VCS program mirrors the shape of a TV picture itself: an outer loop that repeats once per frame, and inside it the steady march of scanlines that compose that frame. You never call a "draw the screen" routine — your code, ticking line by line, *is* that routine. It's telling that in the 1970s these were sold as **TV games** rather than "video games": the television wasn't merely where the game showed up, it was the thing you were programming.
-
-It helps to know what the machine was *for*. The VCS was conceived as a programmable home version of the arcade hits of its moment — *Tank* and *Pong* — a single box that could play many variations of both. That origin is stamped into the hardware: the graphics primitives it hands you are almost exactly what those two games need, and no more. That's why the chip gives you two movable players, two shots, a ball, and a simple walled background rather than anything more general — and why, ever since, getting it to draw something it *wasn't* designed for has been the whole sport. We'll meet those primitives one at a time; just know the oddly specific shape of the hardware is a fossil of the games it was built to play.
-
 ## The whole machine is four chips
 
-And there isn't much machine to come to grips with. The whole console is essentially **four chips** sharing one bus:
+The chart's right-hand column is the entire computer. There's not much machine to come to grips with — the whole console is essentially **four chips** sharing one bus:
 
 - the **processor** (a 6507) that runs your code,
 - the **video & sound chip** (the TIA) that generates the picture and audio,
@@ -45,6 +39,12 @@ And there isn't much machine to come to grips with. The whole console is essenti
 - the **program ROM** on your cartridge.
 
 That's the entire cast. We'll meet each one properly in [VCS Architecture]({{< relref "/docs/architecture" >}}); for now it's enough to know the lineup is short and you will come to know every part of it intimately.
+
+## The job is to generate a television signal
+
+So what *is* the work? At its core, programming the VCS means writing software that **generates a television signal in real time** — and does it while simultaneously reading the joystick and responding to the player. There is no frame buffer to quietly draw into and hand off; your code and the electron beam travel down the screen together, in lockstep. Because of that, the *shape* of a VCS program mirrors the shape of a TV picture itself: an outer loop that repeats once per frame, and inside it the steady march of scanlines that compose that frame. You never call a "draw the screen" routine — your code, ticking line by line, *is* that routine. It's telling that in the 1970s these were sold as **TV games** rather than "video games": the television wasn't merely where the game showed up, it was the thing you were programming.
+
+It helps to know what the machine was *for*. The VCS was conceived as a programmable home version of the arcade hits of its moment — *Tank* and *Pong* — a single box that could play many variations of both. That origin is stamped into the hardware: the graphics primitives it hands you are almost exactly what those two games need, and no more. That's why the chip gives you two movable players, two shots, a ball, and a simple walled background rather than anything more general — and why, ever since, getting it to draw something it *wasn't* designed for has been the whole sport. We'll meet those primitives one at a time; just know the oddly specific shape of the hardware is a fossil of the games it was built to play.
 
 ## How to read this book
 
