@@ -20,14 +20,18 @@ The whole top-to-bottom pass is one **frame**. The beam never stops moving; your
 
 ## Sync tells the TV where the beam should be
 
-On its own, the television can't hold the picture in place: its sweep timing slowly drifts, and nothing in the set knows where the broadcast means each line and frame to begin. It has to be told — by **sync** pulses buried in the video signal:
+On its own, a television can't hold a perfectly stable picture. Inside the set are electronic timing circuits that drive the electron beam horizontally across the screen and then back to the top for the next frame. Those circuits are built to run at almost exactly the right speed — but "almost" isn't good enough. Like any analog oscillator, they slowly drift.
 
-- A **horizontal sync** pulse marks the start of each new scanline.
-- A **vertical sync** pulse marks the start of each new frame.
+To understand why, imagine a runner trying to maintain an **8:00-minute-per-mile pace** with nothing — and no one — to help them hold it. A skilled runner might stay close for a while, but over the course of several miles they'll gradually speed up or slow down. Now imagine another runner — the official pacer — running exactly 8:00 pace. Every few seconds our runner glances over, notices they're a step ahead or behind, and makes a tiny correction. Most of the time the adjustment is so small you wouldn't even notice it.
 
-It helps to picture the TV not as passive but as a runner in a race, trying to hold a perfect 8:00-minute-per-mile pace. The set's sweep circuitry has its own internal oscillators that already move the beam at *very nearly* the right speed — like a trained runner who can hold close to that pace from memory. Close, but not perfect: left alone, the timing slowly drifts. So the *authoritative* pace can't come from the runner — it has to come from outside, and **the broadcaster embeds it right in the video signal.** The sync pulses are that beat, a metronome riding along with the picture: every line of video arrives stamped with the tick that says exactly when it begins. Each **horizontal** pulse keeps every line on tempo; each **vertical** pulse is the downbeat that says *back to the top, a new frame begins.* The set is the runner, never the pacer — it keeps an already-moving beam **locked** to the beat carried in the very signal it's receiving, instead of guessing the pace on its own.
+A television works much the same way. It already knows roughly how fast to sweep the beam across the screen, but it constantly needs tiny corrections to keep the picture perfectly aligned. Those corrections come from **sync pulses** embedded in the video signal.
 
-On a conventional analog television broadcast — the over-the-air signal that fed living-room sets for decades, before digital transmission took over — these sync pulses arrive embedded in the incoming signal, and a healthy set re-locks to them line after line, frame after frame, with no one the wiser. You only learned they were there when something went wrong with them.
+- A **horizontal sync pulse** arrives once per scanline and says, "This line starts here."
+- A **vertical sync pulse** arrives once per frame and says, "This frame starts here."
+
+The television isn't being told how to move the beam every instant. It's already doing that on its own. Instead, the sync pulses act like the runner's occasional glance at the pacer, gently correcting the timing before it has a chance to drift. The beam stays locked to the broadcaster's timing, line after line and frame after frame.
+
+On a conventional analog television broadcast — the over-the-air signal that fed living-room sets for decades before digital television — these sync pulses were quietly embedded alongside the picture itself. Under normal conditions, the viewer never knew they were there. You only noticed them when something interrupted the timing: the picture would roll vertically, tear horizontally, or lose lock altogether.
 
 ### When the picture loses lock
 
@@ -54,7 +58,7 @@ A TV redraws the whole frame many times a second to produce a steady image. How 
 | Active (visible) lines | ~240 | ~288 |
 | Color clocks per line | 228 (~160 visible) | 228 (~160 visible) |
 
-The two share the *same* horizontal timing — 228 color clocks per scanline — so a single line takes exactly as long on either standard. What differs is the **number of lines** in a frame and the **refresh rate**: a PAL frame is taller and arrives more slowly. PAL and NTSC also encode color completely differently, so the same color value shows as a different hue on each.
+A **color clock** is the smallest unit of horizontal timing on the signal — the finest grain at which the picture can change as the beam sweeps across a line, ticking at the TV's color reference rate (about 3.58 million times a second on NTSC). Each scanline is **228 color clocks** long, and the two standards share that timing *exactly* — so a single line takes the same time on either. What differs is the **number of lines** in a frame and the **refresh rate**: a PAL frame is taller and arrives more slowly. PAL and NTSC also encode color completely differently, so the same color value shows as a different hue on each.
 
 A third standard, **SECAM** (France, the former Soviet bloc, and parts of Africa and the Middle East), shares PAL's taller 50 Hz frame but encodes color differently again. It rarely enters into VCS work, so it's named here only for completeness — **this book targets NTSC throughout.**
 
