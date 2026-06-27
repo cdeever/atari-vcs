@@ -20,12 +20,12 @@ The whole top-to-bottom pass is one **frame**. The beam never stops moving; your
 
 ## Sync tells the TV where the beam should be
 
-The television has no idea where a "line" or a "frame" begins on its own — it has to be told, by **sync** pulses buried in the video signal:
+On its own, the television can't hold the picture in place: its sweep timing slowly drifts, and nothing in the set knows where the broadcast means each line and frame to begin. It has to be told — by **sync** pulses buried in the video signal:
 
 - A **horizontal sync** pulse marks the start of each new scanline.
 - A **vertical sync** pulse marks the start of each new frame.
 
-It helps to picture the TV not as passive but as a runner in a race trying to lock in on a perfect 8:00-minute-per-mile pace. The set's sweep circuitry has its own internal oscillators that already move the beam at *very nearly* the right speed — like a trained runner who can hold close to that pace from memory. Close, but not perfect: left alone, the timing slowly drifts. The sync pulses are the beat the runner locks onto, a metronome embedded in the signal. Each **horizontal** pulse is a tick that keeps every line on tempo; each **vertical** pulse is the downbeat that says *back to the top, a new frame begins.* The pulses don't drag the beam around from scratch — they keep an already-moving beam **locked** to the exact timing, the way a runner holds a perfect pace by matching a beat instead of guessing.
+It helps to picture the TV not as passive but as a runner in a race, trying to hold a perfect 8:00-minute-per-mile pace. The set's sweep circuitry has its own internal oscillators that already move the beam at *very nearly* the right speed — like a trained runner who can hold close to that pace from memory. Close, but not perfect: left alone, the timing slowly drifts. So the *authoritative* pace can't come from the runner — it has to come from outside, and **the broadcaster embeds it right in the video signal.** The sync pulses are that beat, a metronome riding along with the picture: every line of video arrives stamped with the tick that says exactly when it begins. Each **horizontal** pulse keeps every line on tempo; each **vertical** pulse is the downbeat that says *back to the top, a new frame begins.* The set is the runner, never the pacer — it keeps an already-moving beam **locked** to the beat carried in the very signal it's receiving, instead of guessing the pace on its own.
 
 On a conventional analog television broadcast — the over-the-air signal that fed living-room sets for decades, before digital transmission took over — these sync pulses arrive embedded in the incoming signal, and a healthy set re-locks to them line after line, frame after frame, with no one the wiser. You only learned they were there when something went wrong with them.
 
