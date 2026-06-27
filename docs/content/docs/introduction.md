@@ -10,6 +10,17 @@ If you arrive here from modern software development, much of your hard-won insti
 
 > "You must unlearn what you have learned."
 
+| Modern Programming | VCS/2600 Programming |
+|---|---|
+| ~~Cloud APIs~~ | **6507 CPU** |
+| ~~Containers~~ | **TIA** |
+| ~~Frameworks~~ | **RIOT** |
+| ~~Standard Libraries~~ | **Program ROM** |
+| ~~Drivers~~ | **CRT** |
+| ~~Operating System~~ | *…and that's the whole machine* |
+
+<p style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:-0.5rem;"><em>Forget the abstractions — on the VCS, you become one with the machine.</em></p>
+
 Take that less as a warning than as an invitation. Stripped of the abstractions, you get to see exactly what the machine is doing on every cycle — and that directness is the whole appeal.
 
 ## The job is to generate a television signal
