@@ -57,7 +57,6 @@ Three places this combines with [thinking in bits]({{< relref "bits" >}}) later 
 - **Collision detection** ([Collisions]({{< relref "/docs/collisions" >}})) — the TIA reports collisions in the top bits of its latch registers, so you test them with `BIT` and branch on the N/V flags rather than comparing numbers.
 - **Sound and sizing** — `AUDC`, `NUSIZ`, and `CTRLPF` pack several independent settings into one register; changing one feature means modifying *some* bits while preserving the others.
 
-## Tips & Caveats
+One more habit, from the same RAM-versus-hardware split:
 
 - **Write-only registers need a shadow.** Most TIA registers can't be read back. If your logic needs to know the current contents of a hardware register, keep the authoritative value in a RAM variable and write that variable to the register — never expect to `lda` it back.
-- **Know which addresses are RAM and which are hardware.** They use the same `lda`/`sta` instructions but behave completely differently — one stores a value you can retrieve, the other commands a chip.

@@ -72,7 +72,7 @@ The sharpest difference is color: NTSC, PAL, and SECAM each encode it a complete
 
 So a television has no fixed resolution to dial in — its picture size simply *emerges* from the signal's timing: the width from how many color clocks a line spends on picture, the height from how many of the standard's lines it lights. How a VCS program decides those things — filling that width, choosing those lines — is the craft picked up in the [Playfield]({{< relref "/docs/playfield" >}}) and [Sprites]({{< relref "/docs/sprites" >}}) chapters. That's the mental shift this whole chapter is preparing you for: there is no buffer and no resolution dial — only a beam, a clock, and a signal deciding what to show at each tick.
 
-## Tips & Caveats
+## In Practice
 
 - **Broadcast TV is interlaced; console signals usually aren't.** A broadcast frame interlaces two half-frames ("fields") for extra vertical detail — 525 lines on NTSC all told. A game console like the VCS skips interlacing and redraws the same ~262-line frame every time, a "240p-style" signal that sets accept happily — which is why that 262 looks low beside the 525 broadcast figure.
 - **NTSC and PAL are not interchangeable.** The two standards differ in refresh rate, line count, and color encoding, so a program written for one will not simply work on the other — the different timing ripples all the way down into the code, which has to target a specific standard. Those consequences are taken up where the frame is built, in [The Frame Structure]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}).

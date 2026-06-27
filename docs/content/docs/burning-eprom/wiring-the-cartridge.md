@@ -40,9 +40,12 @@ The 27-series is **not** pin-compatible across sizes. The classic, repeatedly-re
 
 Pin 21 is the programming voltage on a 2716 but the **A11 address line** on a 2732. A socket wired for one chip will mis-feed the other — at best nothing works, at worst you put programming voltage where an address line expects logic levels.
 
+> [!CAUTION]
+> A pinout mismatch isn't just "won't boot." Feeding programming voltage (12–25 V) into a pin the board drives as a logic-level address line can **destroy the chip** — and possibly the socket. Wire to the *exact* part you're using, checked against a reference schematic.
+
 The same theme repeats in the 28-pin parts (2764 → 27128 → 27256 → 27512): each larger chip **repurposes former V<sub>PP</sub>/`/PGM` pins as new high address lines** (for example the 27512 turns pin 1 into A15 and combines `/OE`//V<sub>PP</sub> on pin 22). So you cannot drop a 27512 into a socket wired for a 2764 and expect it to work.
 
-## Tips & Caveats
+## In Practice
 
 - **Tie unused high address lines to a defined level.** If you burn a small image into a big chip, A12+ (whatever the console doesn't drive) must be strapped high or low to select your bank — a *floating* CMOS address input drifts and the chip reads from a random region. See [Preparing the ROM Image]({{< relref "preparing-the-image" >}}).
 - **Verify enable behavior with a meter, not by assumption.** Confirm the ROM's data pins go high-impedance when A12 is low before trusting the cart in a console.

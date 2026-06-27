@@ -34,7 +34,7 @@ That single cycle is invisible until it isn't: in a kernel counting to 76, a tab
 
 > Note: **stores never get the page-cross discount.** `STA addr,X` is always 5 cycles whether or not it crosses a page — the CPU does the fix-up every time. Only *reads* are sometimes-4-sometimes-5; writes are a flat, predictable cost, which is occasionally a reason to prefer them in tight timing.
 
-## Tips & Caveats
+## In Practice
 
 - **Immediate vs. zero page is the `#` you can't forget.** `LDA #$84` loads the *number* `$84`; `LDA $84` loads the *contents* of address `$84`. Same instruction, completely different result — the single most common beginner bug.
 - **Indexed modes are how you walk tables.** `LDX #0` … `LDA Digits,X` … `INX` is the shape of nearly every data-driven loop: graphics rows, sound sequences, lookup tables.

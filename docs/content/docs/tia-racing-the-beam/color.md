@@ -51,7 +51,7 @@ Count the registers again — background, playfield, player 0, player 1 — and 
 
 Programmers blew past it almost immediately by exploiting the one freedom the latches allow: a color register can be **rewritten between scanlines**, so the "background" can be a different color on every line, a player can shade from head to foot, and the playfield can run a gradient down the screen. The picture is still only four colors *on any single line* — but down the height of the frame it can show dozens. The technique for a sprite is [Coloring each row]({{< relref "/docs/sprites/drawing-a-player" >}}); the same idea drives the colored bands you see behind so many games' [playfields]({{< relref "/docs/playfield" >}}).
 
-## Tips & Caveats
+## In Practice
 
 - **Set static colors once.** Because the registers latch, colors that never change (a fixed background, a steady score color) belong in your startup code, not your kernel — writing them every line just burns cycles from the [76-cycle budget]({{< relref "_index" >}}).
 - **The ball and missiles have no color of their own.** The ball draws in `COLUPF`, missile 0 in `COLUP0`, missile 1 in `COLUP1` — change those and you move the object's color too. See [Missiles & the Ball]({{< relref "/docs/sprites/missiles-and-ball" >}}).

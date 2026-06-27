@@ -69,7 +69,7 @@ Re-enable `VBLANK` and spend the final 30 lines. This is the natural home for re
     jmp StartFrame ; next frame
 ```
 
-## Tips & Caveats
+## In Practice
 
 - **The line counts must add up.** `3 + 37 + 192 + 30 = 262`. If your visible region emits 191 or 193 `WSYNC`s, the frame is the wrong height and the TV picture rolls or the image is unstable.
 - **`WSYNC` rounds *up* to a line boundary.** It's forgiving of how many cycles your code used *within* a line, but it cannot give cycles back — if a single line's work exceeds ~76 cycles before you hit `WSYNC`, you've overrun into the next line.

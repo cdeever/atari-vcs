@@ -81,7 +81,7 @@ You now have enough to read a real fragment. From the Christmas-tree kernel:
 
 *Set X to zero, write that zero into the `PF1` register to blank it, then wait seven scanlines.* Once the symbols (`#`, `$`, labels, directives) stop being noise, the rest of the book reads as plain instructions.
 
-## Tips & Caveats
+## In Practice
 
 - **`#` is the most important character on the line.** Forgetting it — `lda COLUBK` when you meant `lda #COLUBK` — is the single most common beginner bug: you load the *contents* of an address instead of the address (or value) itself.
 - **Directives have no cost at runtime.** `org`, `=`, `REPEAT`, and `.byte` shape the ROM at assembly time; only mnemonics become executable bytes. Counting cycles? Count instructions, not directives.

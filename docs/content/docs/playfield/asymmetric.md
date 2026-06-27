@@ -77,7 +77,7 @@ You don't have to choose one mode for the whole screen. Both the playfield regis
 
 You spend the expensive mid-line technique only on the bands that actually need to differ left-to-right, and let the cheap symmetric path carry the rest — a typical VCS trade of cycles for exactly the visual you need, and nowhere else.
 
-## Tips & Caveats
+## In Practice
 
 - **Six writes a line is the budget killer.** Two writes each to `PF0`/`PF1`/`PF2`, every scanline, on top of fetching the graphics — that eats a large slice of each line's [76-cycle budget]({{< relref "/docs/tia-racing-the-beam" >}}), leaving little for sprites or logic. That's the reason to confine asymmetry to the bands that need it.
 - **Leave margin for clone consoles.** The extra buffering clock on some non-original TIAs can push a write that's "just in time" on a real VCS one cycle too late on a clone. Aim a cycle or two inside the deadline rather than right at it.

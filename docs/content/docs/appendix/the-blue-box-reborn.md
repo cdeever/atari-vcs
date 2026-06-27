@@ -108,7 +108,7 @@ digraph bluebox {
 }
 {{< /graphviz >}}
 
-## Tips & Caveats
+## In Practice
 
 - **This is the fun hard road, by choice.** If you only want your code on real hardware, the easy path is the rest of this book: assemble with DASM and load the `.bin` onto a flashable cart (a Harmony/Melody or UnoCart) or [burn an EPROM]({{< relref "/docs/burning-eprom" >}}). The blue-box recreation is for the journey, not the shortcut.
 - **SIMH is not a real PDP-11.** A simulator booting RT-11 gives you the software experience and the front-panel theatre, but it runs at modern speeds on a Raspberry Pi — you won't suffer the literal 40-minute assemble (and you needn't pretend to).

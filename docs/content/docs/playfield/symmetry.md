@@ -25,7 +25,7 @@ Either way, **both halves come from one set of register values.** That is the ch
 
 The reflect bit lives in `CTRLPF` alongside other playfield controls — [object priority]({{< relref "/docs/sprites/priority" >}}) and the [score-mode coloring]({{< relref "scoreboard" >}}) — and like any register it can be **rewritten between scanlines**, so one band of the screen can be reflected while another repeats.
 
-## Tips & Caveats
+## In Practice
 
 - **Mind the center seam.** Under reflection the screen mirrors around the middle, so the last bit of `PF2` sits next to its own reflection — a lit pixel there reads as a 2-pixel-wide block straddling center. Plan shapes that meet in the middle with that doubling in mind.
 - **The bit order still applies.** Even for a symmetric shape, you're laying out the *left* half into `PF0`/`PF1`/`PF2` with `PF0`'s half-nibble and `PF1` reversed; reflection only handles the right half for you, not the quirks of the left.

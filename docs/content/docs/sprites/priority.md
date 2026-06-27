@@ -50,7 +50,7 @@ Priority is one of several controls packed into the single `CTRLPF` register. Th
 
 Like any TIA register, `CTRLPF` can be [rewritten between scanlines]({{< relref "/docs/playfield/asymmetric" >}}), so all four of these can differ from one band of the screen to the next.
 
-## Tips & Caveats
+## In Practice
 
 - **Priority decides the picture; collisions decide the rules.** They're independent — a hit is registered whether or not the object that hit was the one drawn on top. Reach for [Collisions]({{< relref "/docs/collisions" >}}) for the latter.
 - **The two players are not equal.** P0 (and M0) always beat P1 (and M1). If two characters can overlap and you care who looks "nearer," assign the front one to player 0.

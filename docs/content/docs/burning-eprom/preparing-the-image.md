@@ -43,7 +43,7 @@ You cannot make a 5K or 8K *unbanked* cartridge — the 6507 has no address line
 
 The **power-on bank must contain the reset vectors.** By convention the last bank is active at reset, so put your startup code and the `$FFFC` vectors there. See [Bankswitching]({{< relref "/docs/cartridge-hardware/bankswitching" >}}) for the schemes themselves.
 
-## Tips & Caveats
+## In Practice
 
 - **Check the file size before you burn.** A 4K game should be exactly 4096 bytes; a 2K game 2048. An off-by-one (e.g. an assembler emitting an extra trailing byte) shifts everything and moves your vectors.
 - **Re-verify in Stella *after* any padding/mirroring step.** Stella will happily run the padded/mirrored `.bin`; if it doesn't boot there, it certainly won't on hardware.

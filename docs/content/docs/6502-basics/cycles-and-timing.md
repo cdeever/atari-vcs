@@ -46,7 +46,7 @@ That makes `WSYNC` the workhorse of timing you don't need to be precise about �
 
 To check a kernel line fits, add the cost of every instruction from one `WSYNC` to the next and confirm the total is ≤ 76. The assembler's listing file (`.lst`) shows the bytes each line produced, and tools like Stella's debugger display a live cycle/color-clock counter — but the habit worth building is doing the arithmetic in your head as you write, because that's what lets you *feel* whether a line has room left.
 
-## Tips & Caveats
+## In Practice
 
 - **The exact numbers are worth memorizing for the common forms.** Load-3-or-4, store-3-or-4, branch-2-or-3, `INX`-2: those four cover most of a kernel, and knowing them cold is the difference between writing a kernel and debugging a rolling screen.
 - **Page-crossing bugs hide until they don't.** A kernel that works moves one byte, a table crosses a page, and a line silently gains a cycle. If a stable kernel tears after an unrelated edit, suspect alignment first.

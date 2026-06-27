@@ -18,6 +18,9 @@ weight: 111
 
 **For iterating on a game, pick something electrically erasable** (EEPROM or a Winbond/SST flash part). Reserve UV EPROMs for when you specifically want the vintage experience or already own a stack of them — the burn → test → "oops" → 20-minute-erase cycle gets old fast.
 
+> [!CAUTION]
+> **OTP parts are one-shot.** A plastic-package part with no window is One-Time Programmable — it burns once, and then it's permanent. Verify your image in Stella *before* committing it to an OTP chip, or you've thrown the part away.
+
 ## Matching size to your game
 
 Cartridge size is dictated by the 6507's address space, not by the biggest chip you own:
@@ -32,9 +35,10 @@ You can absolutely burn a 2K or 4K game into a physically larger chip (e.g. a 4K
 
 A modern USB programmer — the **XGecu TL866II Plus** or **T48** is the de-facto homebrew standard — handles all of the above and auto-selects the correct programming voltage (V<sub>PP</sub>) when you tell it the *exact* part number.
 
-## Tips & Caveats
+> [!CAUTION]
+> **V<sub>PP</sub> varies and matters.** Vintage parts want 12.5 V, 21 V, or 25 V to program, and the suffix on the part number encodes which. Select the *exact* marking on the package — the wrong choice can under-program (flaky bits) or **over-volt and kill the chip.**
 
-- **V<sub>PP</sub> varies and matters.** Vintage parts may want 12.5 V, 21 V, or 25 V to program. The suffix on the part number encodes it. Selecting the wrong chip in the programmer can under-program (flaky bits) or over-volt (dead chip). Always select the exact marking on the package.
-- **OTP parts are one-shot.** A plastic-package 27C256 with no window is One-Time Programmable. Confirm your image is *right* — verify it in Stella again — before burning an OTP part.
+## In Practice
+
 - **Always blank-check, then verify.** Blank-check before writing; verify after. A single bit that didn't take reads fine to the eye but crashes intermittently on real hardware in a way Stella will never show you.
 - **Access time is a non-issue.** Even a slow 450 ns EPROM is comfortably fast for the ~838 ns 6507 cycle. Don't pay extra for fast parts.

@@ -61,7 +61,7 @@ That's how a sprite shows a head-to-foot gradient or a striped, multi-colored bo
 
 `VDELP0` / `VDELP1` hold a player's graphics update back by one scanline. It exists for **two-line kernels** — kernels that spend two scanlines per loop to buy time — and for positioning a sprite on an odd vs. even line. The mechanics belong with [Kernel Techniques]({{< relref "/docs/kernel-techniques" >}}); for now, just know `VDEL` is the knob that makes a sprite update on the "other" line.
 
-## Tips & Caveats
+## In Practice
 
 - **Off-screen means write zero.** A common bug is a sprite that smears down the whole screen — usually because `GRP0` is never cleared outside the sprite's rows. Every line that isn't drawing the sprite must write `0`.
 - **Bitmap order follows your loop, not gravity.** The table above is written top row first, but many kernels count scanlines from the *bottom* up — so you'll often see sprite data stored bottom-row-first ("upside down"). Neither is more correct; the byte order just has to match the direction your kernel walks the table. Author it whichever way your counter runs.

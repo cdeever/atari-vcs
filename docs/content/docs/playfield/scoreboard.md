@@ -91,7 +91,7 @@ There's one more snag: a nibble holds 0–15, but a decimal digit only goes to 9
 
 Mind the catch from [Numbers & Arithmetic]({{< relref "/docs/prerequisites/numbers" >}}): decimal mode only affects `ADC`/`SBC` (and needs `CLC` first), **not** `INC`/`DEC` — so score it with an add, never an increment.
 
-## Tips & Caveats
+## In Practice
 
 - **Digit width is fixed.** Playfield pixels are 4 color clocks wide and can't be narrowed, so playfield digits are chunky. For finer or more numerous digits, games use the *player* (sprite) objects instead — a technique for the [Sprites]({{< relref "/docs/sprites" >}}) chapter.
 - **Keep the score display-ready.** Storing the score in BCD means no run-time binary-to-decimal conversion — the nibbles *are* the digits. That trade (decimal math for free display) is why nearly every VCS score is BCD.

@@ -23,7 +23,7 @@ The [TIA]({{< relref "/docs/architecture/programming-the-television" >}}) has [t
 
 Every other escape in this chapter expands what the hardware *has* — more ROM, more RAM. The DPC expands what the cartridge *does*: it offloads computation, the one thing a passive chip never could. That makes it the natural horizon of "put hardware on the cart," and the bridge to the modern era — today's homebrew carts (the Harmony/Melody boards and their **DPC+**/CDF formats) carry a full ARM processor that emulates the original DPC and goes much further, running game logic the 6507 never touches.
 
-## Tips & Caveats
+## In Practice
 
 - **You will almost certainly never write for the original DPC.** One commercial game used it, its display ROM and registers are specific to that design, and there's no assembler-level "DPC mode" you reach for. It's here as the idea's furthest point, not a technique to adopt.
 - **Stella emulates it.** If you want to *see* the data fetchers and music engine at work, the DPC is a supported cartridge type in the emulator — load Pitfall II and watch the audio run free of the kernel.

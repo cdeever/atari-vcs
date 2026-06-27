@@ -50,7 +50,7 @@ The standard Atari schemes are named for their hotspot addresses up near the top
 
 That the swap is invisible to the instruction set is a gift and a hazard in equal measure. It means a larger ROM needs no new opcodes — but it also means an innocent-looking access can pull the rug out from under your own running code. Both consequences belong to the software side: [Programming Across Banks]({{< relref "programming-across-banks" >}}).
 
-## Tips & Caveats
+## In Practice
 
 - **Pick the scheme before you write much.** Bankswitching shapes how you lay out code (what lives in which bank, where the stubs go), so choosing F8 vs. F6 isn't a late decision — it's architecture. The physical side is in [Preparing the ROM Image]({{< relref "/docs/burning-eprom/preparing-the-image" >}}).
 - **The hotspots are the same addresses in every bank.** Because the cartridge decodes the address no matter which bank is showing, a hotspot reaches the switch from anywhere — which is exactly what makes the matching-stub trick on the next page possible.

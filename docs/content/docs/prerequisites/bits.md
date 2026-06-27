@@ -86,7 +86,7 @@ A **mask** is just a byte you choose to select which bits an operation touches.
     beq MoveRight    ; result 0 -> that bit was 0 -> direction is pressed
 ```
 
-## Tips & Caveats
+## In Practice
 
 - **Preserve the bits you don't own.** When a register holds several features, never blindly `lda #constant` / `sta` if other bits matter — read, modify with `ORA`/`AND`, write back. Stomping unrelated bits is a classic source of "why did the sound change when I moved the player?" bugs.
 - **`%` makes intent visible; `$` makes it compact.** Write switch patterns in binary and numbers/addresses in hex. Future-you reading `%00100000` instantly sees "bit 5"; reading `$20` you have to decode it.

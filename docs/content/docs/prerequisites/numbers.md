@@ -41,7 +41,7 @@ The 6502 has a **decimal (BCD) mode**, toggled with `SED` / `CLD`, in which `ADC
 
 Two things to remember: decimal mode only changes `ADC`/`SBC` — and, like any add, the `ADC` still wants a `CLC` first. The `INC`/`DEC` instructions **ignore decimal mode entirely**, so you bump a BCD score with an add (`CLC` / `ADC #$01`), never with an increment.
 
-## Tips & Caveats
+## In Practice
 
 - **Velocities are just signed bytes.** Store a leftward speed as `$FF` (−1) and add it to a position; two's complement makes the subtraction "just work," wraparound and all.
 - **Precompute, don't calculate.** With no multiply and a tight [cycle budget]({{< relref "/docs/6502-basics" >}}), the habit is to bake results into ROM tables ahead of time and look them up — trading scarce [RAM]({{< relref "memory-mapped" >}}) and cycles for plentiful ROM.
