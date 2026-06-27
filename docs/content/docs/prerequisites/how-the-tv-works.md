@@ -46,6 +46,14 @@ Older sets handed the viewer direct control over those very oscillators, as two 
 
 That is the medium the VCS must satisfy. Generating those sync pulses at exactly the right moments — so the television never has a reason to roll or tear in the first place — is the job of the console's video chip and your program, taken up in [The Video & Sound Chip (TIA)]({{< relref "/docs/architecture/programming-the-television" >}}) and [The Frame Structure]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}).
 
+## Inside a single scanline
+
+You've watched the beam march down the frame one line at a time. Now zoom in on a single line. A scanline is a continuous **left-to-right sweep**, not a row of pixels — there is no grid of dots underneath it, only a beam moving across. What sets the limit on how finely the picture can change along that sweep is the **color clock**.
+
+A **color clock** is the smallest unit of horizontal timing on the signal — the finest grain at which the picture can change as the beam crosses the line, ticking at the TV's color reference rate (about 3.58 million times a second on NTSC).
+
+A full scanline is **228 color clocks** wide, but not all of it is picture. About **160** carry the visible image; the other **68** are spent on the **horizontal blank** — the beam switched off, snapping back to the left for the next line (the HBLANK from earlier). So the horizontal "canvas" a single line offers is only about **160 steps** wide. There's no pixel grid and no resolution dial: how much horizontal detail you get is simply how finely those ~160 visible clocks are divided up.
+
 ## Frames per second, and the two standards
 
 A TV redraws the whole frame many times a second to produce a steady image. How many — and how many scanlines make up a frame — depends on the regional broadcast standard the set was built for. Two dominate, with a third worth naming:
@@ -58,20 +66,11 @@ A TV redraws the whole frame many times a second to produce a steady image. How 
 | Active (visible) lines | ~240 | ~288 |
 | Color clocks per line | 228 (~160 visible) | 228 (~160 visible) |
 
-A **color clock** is the smallest unit of horizontal timing on the signal — the finest grain at which the picture can change as the beam sweeps across a line, ticking at the TV's color reference rate (about 3.58 million times a second on NTSC). Each scanline is **228 color clocks** long, and the two standards share that timing *exactly* — so a single line takes the same time on either. What differs is the **number of lines** in a frame and the **refresh rate**: a PAL frame is taller and arrives more slowly. PAL and NTSC also encode color completely differently, so the same color value shows as a different hue on each.
+Both standards build a line the same way — the **228 color clocks** from the previous section — so a single scanline takes exactly as long on either. What differs is the **number of lines** in a frame and the **refresh rate**: a PAL frame is taller (more scanlines) and arrives more slowly. And because the picture is only ever as tall as the **visible scanlines** drawn between the blanking margins, that line count *is* the vertical dimension — there's no separate vertical-resolution setting, just lines, and they must total the standard's count (262 for NTSC) or the set loses sync. PAL and NTSC also encode color completely differently, so the same color value shows as a different hue on each.
 
 A third standard, **SECAM** (France, the former Soviet bloc, and parts of Africa and the Middle East), shares PAL's taller 50 Hz frame but encodes color differently again. It rarely enters into VCS work, so it's named here only for completeness — **this book targets NTSC throughout.**
 
-## "Resolution" isn't a setting — it's how you spend time
-
-An analog television has no fixed grid of pixels and no resolution dial. The picture's dimensions are just a consequence of the signal's timing:
-
-- **Horizontally**, a scanline is a continuous sweep, not a row of pixels — but the color subcarrier limits how finely detail can change across it. In practice a line resolves on the order of **160 distinct steps** of visible width (the full line spans 228 "color clocks," with the remaining 68 lost to the horizontal-blank retrace). That is roughly the horizontal canvas a single line offers.
-- **Vertically**, the picture is simply as tall as the **number of visible scanlines** drawn between the blanking margins — there is no separate vertical-resolution setting, only lines, and they must add up to the standard's total (262 for NTSC) or the set loses sync.
-
-So on a television, "resolution" isn't a number you select; it emerges from how the signal spends its color clocks along each line and how many of the standard's lines it lights. How a VCS program decides those things — filling that width, choosing those lines — is the craft picked up in the [Playfield]({{< relref "/docs/playfield" >}}) and [Sprites]({{< relref "/docs/sprites" >}}) chapters.
-
-That's the mental shift this whole chapter is preparing you for: there is no buffer and no resolution dial — only a beam, a clock, and a signal deciding what to show at each tick.
+So a television has no fixed resolution to dial in — its picture size simply *emerges* from the signal's timing: the width from how many color clocks a line spends on picture, the height from how many of the standard's lines it lights. How a VCS program decides those things — filling that width, choosing those lines — is the craft picked up in the [Playfield]({{< relref "/docs/playfield" >}}) and [Sprites]({{< relref "/docs/sprites" >}}) chapters. That's the mental shift this whole chapter is preparing you for: there is no buffer and no resolution dial — only a beam, a clock, and a signal deciding what to show at each tick.
 
 ## Tips & Caveats
 
