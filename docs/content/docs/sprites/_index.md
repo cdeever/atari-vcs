@@ -22,5 +22,6 @@ The defining difference from modern sprites: **there is no X-coordinate register
 - **[Size & Copies (NUSIZ)]({{< relref "size-and-copies" >}})** — stretching a player to 2×/4× and stamping out multiple copies from one bitmap.
 - **[Missiles & the Ball]({{< relref "missiles-and-ball" >}})** — the single-bit objects, their borrowed colors, and firing a shot from a player.
 - **[Object Priority]({{< relref "priority" >}})** — which object is drawn in front when two overlap, and the `CTRLPF` bit that sends sprites behind the playfield.
+- **[Sprite Multiplexing]({{< relref "sprite-multiplexing" >}})** — reusing the two players down the screen, and across frames, to show many objects at once; the software answer to the two-sprite limit.
 
 > Horizontal positioning is the first place beginners hit the cycle wall: the column a player lands in depends on the exact cycle the `RESP0` store executes, so the positioning routine itself must be cycle-counted.

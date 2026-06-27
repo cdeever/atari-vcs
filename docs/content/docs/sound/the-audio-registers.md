@@ -51,7 +51,7 @@ That's the same "race against time" the rest of the machine demands, just slower
 
 ## Two voices, and how to stretch them
 
-Two channels means two simultaneous notes — so a melody on one channel and a bass line or drum on the other is the typical split. Want a third voice? You do what you do everywhere else on this machine: **fake it in software**, by rapidly switching one channel between two notes (an arpeggio that reads as a chord), or — at the extreme — by driving the volume register itself as a [DAC]({{< relref "/docs/projects/music-player" >}}) to synthesize richer sound, at the cost of the entire CPU.
+Two channels means two simultaneous notes — so a melody on one channel and a bass line or drum on the other is the typical split. Want a third voice? You do what you do everywhere else on this machine: **fake it in software**, by rapidly switching one channel between two notes (an arpeggio that reads as a chord), or — at the extreme — by driving the volume register itself as a [DAC](https://github.com/cdeever/atari-vcs/blob/main/music/README.md) to synthesize richer sound, at the cost of the entire CPU.
 
 ## In Practice
 

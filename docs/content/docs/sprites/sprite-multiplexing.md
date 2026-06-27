@@ -1,11 +1,11 @@
 ---
 title: "Sprite Multiplexing"
-weight: 30
+weight: 60
 ---
 
 # Sprite Multiplexing
 
-The third ceiling is the tightest: the TIA has **two [players]({{< relref "/docs/sprites/drawing-a-player" >}})**, and no cartridge hardware adds more. Yet games routinely show a screen full of enemies, shots, and characters. They do it by **time-sharing** the two players — reusing each one to be several different things, either down the screen or across frames.
+The TIA gives you **two [players]({{< relref "drawing-a-player" >}})**, and — unlike ROM or RAM — *no [cartridge hardware]({{< relref "/docs/cartridge-hardware" >}}) adds more.* The two-sprite limit is one you beat in **software**. Yet games routinely show a screen full of enemies, shots, and characters; they do it by **time-sharing** the two players — reusing each one to be several different things, either down the screen or across frames.
 
 ## Reuse down the screen
 

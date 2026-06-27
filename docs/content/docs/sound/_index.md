@@ -15,4 +15,4 @@ The chapter's recurring theme is *scarcity met with ingenuity*, sound edition: o
 - **[Tones, Noise & Pitch]({{< relref "tones-noise-and-pitch" >}})** — the `AUDC` waveform families, and why the `AUDF` divisor leaves the VCS unable to play in tune.
 - **[Playing Music]({{< relref "playing-music" >}})** — a frame-counted sequencer driving a `(note, duration)` song table, plus envelopes and sound effects.
 
-> The VCS's pitches are quantized to the `AUDF` divisors and are famously out of tune. Picking the closest available divisor per note — and sometimes switching `AUDC` mode — is part of writing music for it. For richer output, the [4-Voice Music Player]({{< relref "/docs/projects/music-player" >}}) bypasses the tone generators and drives the volume DAC directly.
+> The VCS's pitches are quantized to the `AUDF` divisors and are famously out of tune. Picking the closest available divisor per note — and sometimes switching `AUDC` mode — is part of writing music for it. For richer output, the [4-Voice Music Player](https://github.com/cdeever/atari-vcs/blob/main/music/README.md) bypasses the tone generators and drives the volume DAC directly.

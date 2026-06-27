@@ -71,7 +71,7 @@ LF1F2: STA    NUSIZ1   ; $06 = three copies, medium → 3 invaders
 LF1FA: STA    NUSIZ0   ; $06 = three copies, medium → 3 more
 ```
 
-That handles one row *across*. To stack the rows *down* the screen, the kernel does [sprite multiplexing]({{< relref "/docs/advanced/sprite-multiplexing" >}}) — and here is the part worth sitting with. **The TIA has only two player objects in the entire machine.** There is never a frame where 36 invaders exist in hardware. At any single instant the beam is painting **one scanline**, and on that line the chip holds just P0 and P1 (tripled by `NUSIZ`) — six sprites, no more. The rows above are already painted and gone; the rows below haven't happened yet. The formation only *looks* simultaneous because your eye fuses a frame the beam draws one line at a time.
+That handles one row *across*. To stack the rows *down* the screen, the kernel does [sprite multiplexing]({{< relref "/docs/sprites/sprite-multiplexing" >}}) — and here is the part worth sitting with. **The TIA has only two player objects in the entire machine.** There is never a frame where 36 invaders exist in hardware. At any single instant the beam is painting **one scanline**, and on that line the chip holds just P0 and P1 (tripled by `NUSIZ`) — six sprites, no more. The rows above are already painted and gone; the rows below haven't happened yet. The formation only *looks* simultaneous because your eye fuses a frame the beam draws one line at a time.
 
 So the same two objects are reused for **every** rank. As the beam falls past each row, the kernel re-arms `GRP0`/`GRP1` with that row's [graphics]({{< relref "/docs/kernel-techniques/front-loading-and-tables" >}}) and marches on. And because the formation is a rigid grid that moves as a block, the two players are positioned horizontally **once per frame** — between rows the kernel swaps only the *pictures*, never the positions. Same two sprites, re-dressed on the fly. Six across × the rows down = the full formation — **36 invaders out of two objects.** Those same two players are then reused *yet again*, in their own bands, for the **mothership** gliding across the top and your **cannon** at the bottom.
 
@@ -86,7 +86,7 @@ LDA ($F6),Y → GRP0     ; column 5's
 TXA         → GRP1/GRP0; column 6's
 ```
 
-So `NUSIZ` sets the *slots* and the just-in-time rewrites give each slot its own *bitmap* — that's how all six aliens in a row can differ (and animate). It is the single best demonstration in this book of [the sprite chapter's]({{< relref "/docs/sprites" >}}) two big multipliers stacked together: **copies** ([horizontal]({{< relref "/docs/sprites/size-and-copies" >}})) and **multiplexing** ([vertical]({{< relref "/docs/advanced/sprite-multiplexing" >}})).
+So `NUSIZ` sets the *slots* and the just-in-time rewrites give each slot its own *bitmap* — that's how all six aliens in a row can differ (and animate). It is the single best demonstration in this book of [the sprite chapter's]({{< relref "/docs/sprites" >}}) two big multipliers stacked together: **copies** ([horizontal]({{< relref "/docs/sprites/size-and-copies" >}})) and **multiplexing** ([vertical]({{< relref "/docs/sprites/sprite-multiplexing" >}})).
 
 And the reuse doesn't stop at the formation. As the beam crosses each zone of the screen, the kernel re-dresses those same two players for a different job — flipping `NUSIZ` back to a single copy (`LDA #$00 / STA NUSIZ0`) above and below the swarm. Read top to bottom, one frame morphs P0 and P1 three times:
 

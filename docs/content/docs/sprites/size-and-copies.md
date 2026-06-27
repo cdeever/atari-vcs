@@ -32,6 +32,6 @@ The same register sizes the matching missile through its high bits: missile *m* 
 
 ## In Practice
 
-- **Copies are the poor player's sprite multiplier.** Need three evenly-spaced identical shapes on a line? One player in a 3-copy mode beats juggling sprites. Their *graphics* can still differ via mid-line `GRP0` rewrites (above), but their **spacing and motion can't** — copies are locked to the fixed `NUSIZ` gaps and move as one. The instant the objects need independent positions or motion, you're back to two players plus [multiplexing]({{< relref "/docs/advanced" >}}).
+- **Copies are the poor player's sprite multiplier.** Need three evenly-spaced identical shapes on a line? One player in a 3-copy mode beats juggling sprites. Their *graphics* can still differ via mid-line `GRP0` rewrites (above), but their **spacing and motion can't** — copies are locked to the fixed `NUSIZ` gaps and move as one. The instant the objects need independent positions or motion, you're back to two players plus [multiplexing]({{< relref "/docs/sprites/sprite-multiplexing" >}}).
 - **Quad-width players make big, coarse shapes cheap.** A 4× player is 32 pixels wide from one bitmap — good for banners, title text built from [player-as-digit graphics]({{< relref "/docs/playfield/scoreboard" >}}), or a large boss, at the cost of chunky pixels.
 - **`NUSIZ` changes can be timed mid-line**, like any register — advanced kernels switch sizes within a frame, though the retiming has its own quirks best left until you're comfortable with steady-state sprites.

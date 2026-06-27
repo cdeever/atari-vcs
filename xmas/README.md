@@ -1,13 +1,18 @@
----
-title: "Christmas Tree Demo"
-weight: 101
----
-
 # Christmas Tree Demo
 
-**Source:** `xmas/xmas.asm`
+**Source:** `xmas.asm`
 
 This is the repository's most developed program and a clean example of a **playfield-only kernel**: there are no sprites at all. The entire picture — a green tree on a red background — is drawn by rewriting the playfield registers as the beam moves down the screen.
+
+## Build & run
+
+```sh
+cd xmas
+make            # assembles xmas.asm -> xmas.bin (+ .sym, .lst)
+make run        # launches Stella on xmas.bin (needs Stella installed)
+```
+
+The build is `dasm xmas.asm -I../include -f3 -v0 ...`; `-I../include` points DASM at the shared headers (`vcs.h`, `macro.h`). It assembles to a 4 KB cartridge.
 
 ## Setup
 
@@ -49,11 +54,11 @@ Each block lights one more bit of `PF2`, so the lit region widens by one playfie
 ## Tips & Caveats
 
 - **The playfield bit order is not uniform.** `PF0` uses only its high nibble (bits 4–7) and is read MSB-first; `PF1` is read in the *opposite* direction from `PF0` and `PF2`. The widening masks above only look intuitive because the demo stays within `PF2` for the tree body. Crossing into `PF1` (as the ground line does with `#%11101111` on `PF0` and `#%11111111` on `PF1`) requires accounting for that reversal.
-- **Every band's line count is part of the 192-line budget.** Sum the `REPEAT` counts in the visible region; they must total 192 or the frame destabilizes. See [The Frame Structure]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}).
+- **Every band's line count is part of the 192-line budget.** Sum the `REPEAT` counts in the visible region; they must total 192 or the frame destabilizes. See [The Frame Structure](https://cdeever.github.io/atari-vcs/docs/tia-racing-the-beam/frame-structure/) in the book.
 
 ## The song table
 
-At the end of the file is a `Song` data table — the format used by the [Sound chapter]({{< relref "/docs/sound" >}})'s sequencer. It is a list of `(note, duration)` byte pairs terminated by `$00`:
+At the end of the file is a `Song` data table — the format used by the book's [Sound chapter](https://cdeever.github.io/atari-vcs/docs/sound/) sequencer. It is a list of `(note, duration)` byte pairs terminated by `$00`:
 
 ```asm
 Song:
@@ -65,4 +70,4 @@ Song:
 
 Each pair is a note index and a duration in *frames* (the VCS has no clock but the 60 Hz frame, so durations are counted in frames). The table is present as data here; wiring it to the audio registers is the exercise the Sound chapter walks through.
 
-> Read `xmas/xmas.asm` top to bottom alongside this page — it is short, and it demonstrates the frame loop, playfield reflection, mid-screen register changes, and a data table all in one file.
+> Read `xmas.asm` top to bottom alongside this page — it is short, and it demonstrates the frame loop, playfield reflection, mid-screen register changes, and a data table all in one file.

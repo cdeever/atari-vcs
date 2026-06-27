@@ -1,11 +1,6 @@
----
-title: "4-Voice Music Player"
-weight: 102
----
-
 # 4-Voice Music Player
 
-**Source:** `music/wavetable.a`
+**Source:** `wavetable.a`
 
 This project shows how far the VCS's audio can be pushed by *abandoning* its tone generators entirely. The TIA's normal `AUDC`/`AUDF`/`AUDV` path gives you two coarse, out-of-tune channels. Instead, this program treats the 4-bit volume register as a tiny **DAC** and computes the output sample by sample in software — summing four independent voices from a wavetable.
 
@@ -46,7 +41,7 @@ Producing a clean audio sample stream requires the CPU's full attention on every
 
 ## Tips & Caveats
 
-- **This is the opposite end of the spectrum from the [Christmas tree]({{< relref "xmas-tree" >}}).** That demo spends nearly all its time on `WSYNC`s and none on computation; this one spends all of it computing audio. Most real games live in between, budgeting cycles across both.
+- **This is the opposite end of the spectrum from the [Christmas tree](../xmas/README.md).** That demo spends nearly all its time on `WSYNC`s and none on computation; this one spends all of it computing audio. Most real games live in between, budgeting cycles across both.
 - **Source is `wavetable.a`, not `.asm`.** `cd music && make` builds it; the underlying command names the `.a` source and the shared headers explicitly:
   ```sh
   dasm wavetable.a -I../include -f3 -v0 -omusic.bin -smusic.sym -lmusic.lst

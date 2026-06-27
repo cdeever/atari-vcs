@@ -116,9 +116,9 @@ Cycle counting, precise waiting, multi-line kernels, and front-loading — the c
 
 <div class="section-card">
 
-### [Advanced Techniques]({{< relref "/docs/advanced" >}})
+### [Extended Cartridge Hardware]({{< relref "/docs/cartridge-hardware" >}})
 
-Bankswitching past 4K, RAM expansion, sprite multiplexing, and other tricks for pushing the hardware.
+Bankswitching past 4K, RAM expansion, and the DPC coprocessor — lifting the machine's limits with hardware on the cartridge.
 
 </div>
 
@@ -127,14 +127,6 @@ Bankswitching past 4K, RAM expansion, sprite multiplexing, and other tricks for 
 ### [Hardware Quirks as Features]({{< relref "/docs/hardware-quirks" >}})
 
 How Cosmic Ark's starfield, Yars' Revenge's neutral zone, and sprite flicker turned bugs and limits into signature effects.
-
-</div>
-
-<div class="section-card">
-
-### [Project Walkthroughs]({{< relref "/docs/projects" >}})
-
-End-to-end builds from this repository, including the Christmas-tree demo and the 4-voice music player.
 
 </div>
 

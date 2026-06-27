@@ -24,7 +24,7 @@ Cartridge size is dictated by the 6507's address space, not by the biggest chip 
 
 - **2K game** → fits a 2716. Built with `org $F800`.
 - **4K game** → fits a 2732. Built with `org $F000`. This is the largest *unbanked* size the console can address directly.
-- **More than 4K** → requires **bankswitching** hardware (see [Preparing the ROM Image]({{< relref "preparing-the-image" >}}) and [Advanced Techniques]({{< relref "/docs/advanced" >}})). The console only has 13 address lines; the upper address lines of an 8K/16K/32K chip must be driven by bankswitch logic, *not* by the console.
+- **More than 4K** → requires **bankswitching** hardware (see [Preparing the ROM Image]({{< relref "preparing-the-image" >}}) and [Bankswitching]({{< relref "/docs/cartridge-hardware/bankswitching" >}})). The console only has 13 address lines; the upper address lines of an 8K/16K/32K chip must be driven by bankswitch logic, *not* by the console.
 
 You can absolutely burn a 2K or 4K game into a physically larger chip (e.g. a 4K game into a 27256) — you just have to place and mirror the image correctly and tie the unused high address lines to a defined level. More on that next.
 

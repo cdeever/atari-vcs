@@ -41,7 +41,7 @@ You cannot make a 5K or 8K *unbanked* cartridge — the 6507 has no address line
 1. Building the ROM with the matching bankswitch format and hotspot writes in your code.
 2. A cartridge board with the **logic to perform the switch** (discrete 74-series glue, a dedicated mapper, or a programmable board).
 
-The **power-on bank must contain the reset vectors.** By convention the last bank is active at reset, so put your startup code and the `$FFFC` vectors there. See [Advanced Techniques]({{< relref "/docs/advanced" >}}) for the schemes themselves.
+The **power-on bank must contain the reset vectors.** By convention the last bank is active at reset, so put your startup code and the `$FFFC` vectors there. See [Bankswitching]({{< relref "/docs/cartridge-hardware/bankswitching" >}}) for the schemes themselves.
 
 ## Tips & Caveats
 

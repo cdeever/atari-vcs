@@ -11,7 +11,7 @@ Not every exploited quirk got its own legend like [Cosmic Ark]({{< relref "cosmi
 
 The TIA gives you exactly [two players]({{< relref "/docs/sprites" >}}). Plenty of games need to show three, four, or a dozen moving things — the ghosts chasing Pac-Man, a field of asteroids, a wall of *Warlords* bricks. The answer is **flicker**: draw some objects on even frames and the rest on odd frames, reusing the same two players for different things each pass. At 60 frames a second, each object appears only 30 times a second, and the eye mostly fuses them into a steady crowd.
 
-"Mostly" is the catch — you can *see* the flicker, the tell-tale shimmer of a 2600 game punching above its object count. It's a limitation made visible, and an entire generation simply accepted it as the look of the machine. (Doing it *well* — spreading objects across frames to minimize the shimmer — is a [Kernel Techniques]({{< relref "/docs/kernel-techniques" >}}) and [sprite-multiplexing]({{< relref "/docs/advanced" >}}) art.)
+"Mostly" is the catch — you can *see* the flicker, the tell-tale shimmer of a 2600 game punching above its object count. It's a limitation made visible, and an entire generation simply accepted it as the look of the machine. (Doing it *well* — spreading objects across frames to minimize the shimmer — is a [Kernel Techniques]({{< relref "/docs/kernel-techniques" >}}) and [sprite-multiplexing]({{< relref "/docs/sprites/sprite-multiplexing" >}}) art.)
 
 ## The HMOVE comb, worn proudly
 

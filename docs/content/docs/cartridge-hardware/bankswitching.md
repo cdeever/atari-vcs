@@ -7,6 +7,8 @@ weight: 10
 
 The [6507]({{< relref "/docs/architecture/cpu" >}}) has 13 address lines, so it can see 8 KB at most — and only the upper 4 KB (`$F000`–`$FFFF`) is the [cartridge window]({{< relref "/docs/architecture/rom" >}}). That's the hard ceiling: **an unbanked cart is 4 KB, full stop.** Every larger game gets there the same way — extra hardware *on the cartridge* swaps which 4 KB is visible in the window.
 
+This page is the **hardware**: how the cartridge pages ROM in and out, and the named schemes that do it. Writing code that survives those swaps — the matching stubs, the reset vectors, the traps — is the next page, [Programming Across Banks]({{< relref "programming-across-banks" >}}).
+
 ## One window, many banks
 
 Picture a 16 KB ROM as four 4 KB **banks**. The console can only ever see one at a time, through its single 4 KB window. Cartridge logic decides which:
@@ -28,7 +30,7 @@ digraph bank {
 
 ## Hotspots: switching with no instruction
 
-Here is the part that surprises everyone: **there is no "switch bank" instruction.** The 6502 doesn't know banks exist. Instead, the cartridge watches the address bus, and **accessing certain addresses — "hotspots" — triggers the swap as a pure side effect.** Just *touching* the address does it; the read or write itself is incidental.
+Here is the part that surprises everyone: **there is no "switch bank" instruction.** The 6502 doesn't know banks exist. Instead, the cartridge watches the address bus, and **accessing certain addresses — "hotspots" — triggers the swap as a pure side effect.** Just *touching* the address does it; the read or write itself is incidental. This is the whole reason the trick can work: the cartridge has nothing to go on *but* the addresses the CPU puts on the bus, so it makes a handful of those addresses mean "switch."
 
 ```asm
     bit $1FF9        ; the access to $1FF9 IS the switch — bank 1 is now live
@@ -46,19 +48,9 @@ The standard Atari schemes are named for their hotspot addresses up near the top
 
 (Others exist — E0, FE, 3E, and more — but F8/F6/F4 cover most Atari-era carts.)
 
-## Living across banks
+That the swap is invisible to the instruction set is a gift and a hazard in equal measure. It means a larger ROM needs no new opcodes — but it also means an innocent-looking access can pull the rug out from under your own running code. Both consequences belong to the software side: [Programming Across Banks]({{< relref "programming-across-banks" >}}).
 
-Two facts make bankswitching delicate:
-
-- **Code keeps running where it left off — in the new bank.** A swap doesn't jump anywhere; the program counter is unchanged, but the bytes under it just changed. So the universal trick is to put **identical switching stubs at the same address in every bank**: when the swap happens, execution continues at the same address, now in the new bank's copy of that stub, which then jumps where you intended. Calling a routine in another bank means *switch, then land on matching code*.
-- **The reset vectors live in the window's top, in every bank.** At power-on the console reads `$FFFC` from whichever bank is active by default (commonly the last). Your startup code must establish a known bank immediately, and every bank needs valid vectors because any of them might be the one showing at reset.
-
-## The hotspot trap
-
-Because *any* access to a hotspot switches the bank, an innocent instruction can pull the rug out from under itself. An `lda` whose operand address, or even an instruction fetch, lands on `$1FF8` will swap the bank mid-stride — and now you're executing different bytes than you wrote. So the top of each bank, around the hotspots and vectors, is treated as **off-limits for ordinary code and data**; you keep tables and routines clear of it.
-
-## In Practice
+## Tips & Caveats
 
 - **Pick the scheme before you write much.** Bankswitching shapes how you lay out code (what lives in which bank, where the stubs go), so choosing F8 vs. F6 isn't a late decision — it's architecture. The physical side is in [Preparing the ROM Image]({{< relref "/docs/burning-eprom/preparing-the-image" >}}).
-- **Keep cross-bank calls rare and ritualized.** Each one is a switch-and-land dance with a stub on both sides; design so that hot loops stay *within* a bank and bank changes happen at coarse boundaries (a new game state, a new screen).
-- **Emulators and the `.lst` are your safety net.** A stray hotspot access is invisible in the source and instant in effect; Stella's debugger showing an unexpected bank change is often the fastest way to find one.
+- **The hotspots are the same addresses in every bank.** Because the cartridge decodes the address no matter which bank is showing, a hotspot reaches the switch from anywhere — which is exactly what makes the matching-stub trick on the next page possible.

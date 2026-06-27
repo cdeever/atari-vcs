@@ -63,7 +63,7 @@ The same trick builds sound effects: a laser is a tone with `AUDF` sliding upwar
 
 ## Beyond two voices
 
-Frame-rate updates and two channels are plenty for melody-plus-bass, but the ceiling is real. To go further you leave the tone generators behind entirely and drive `AUDV` itself as a **4-bit DAC**, computing the waveform sample by sample — the technique the repository's [4-Voice Music Player]({{< relref "/docs/projects/music-player" >}}) uses to get four voices, at the price of the *entire* CPU (it shows no picture while it plays).
+Frame-rate updates and two channels are plenty for melody-plus-bass, but the ceiling is real. To go further you leave the tone generators behind entirely and drive `AUDV` itself as a **4-bit DAC**, computing the waveform sample by sample — the technique the repository's [4-Voice Music Player](https://github.com/cdeever/atari-vcs/blob/main/music/README.md) uses to get four voices, at the price of the *entire* CPU (it shows no picture while it plays).
 
 ## In Practice
 

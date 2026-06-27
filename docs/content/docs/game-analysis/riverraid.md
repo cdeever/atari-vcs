@@ -55,7 +55,7 @@ River Raid is the book's cleanest example of *casting* the TIA's hardware — it
 |--------|------|
 | **Player 0** | your **jet** (fixed near the bottom; `REFP0` to bank left and right) |
 | **Missile 0** | your **shot**, fired upward |
-| **Player 1** | the **enemies** — *one* object [multiplexed]({{< relref "/docs/advanced/sprite-multiplexing" >}}) down the screen to show up to six at once |
+| **Player 1** | the **enemies** — *one* object [multiplexed]({{< relref "/docs/sprites/sprite-multiplexing" >}}) down the screen to show up to six at once |
 | **Ball** | the **fuel-gauge** marker |
 | **Playfield** | the **riverbanks** themselves — the curving walls and islands |
 
