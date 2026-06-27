@@ -116,7 +116,7 @@ Cycle counting, precise waiting, multi-line kernels, and front-loading — the c
 
 <div class="section-card">
 
-### [Extended Cartridge Hardware]({{< relref "/docs/cartridge-hardware" >}})
+### [Extending the Cartridge]({{< relref "/docs/cartridge-hardware" >}})
 
 Bankswitching past 4K, RAM expansion, and the DPC coprocessor — lifting the machine's limits with hardware on the cartridge.
 

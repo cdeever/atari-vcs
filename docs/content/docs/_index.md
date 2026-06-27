@@ -19,7 +19,7 @@ New here? Start with the **[Introduction]({{< relref "/docs/introduction" >}})**
 9. **[Input]({{< relref "/docs/input" >}})** — joysticks, paddles, switches
 10. **[Sound]({{< relref "/docs/sound" >}})** — the TIA audio channels
 11. **[Kernel Techniques]({{< relref "/docs/kernel-techniques" >}})** — fitting a scanline's work into 76 cycles
-12. **[Extended Cartridge Hardware]({{< relref "/docs/cartridge-hardware" >}})** — bankswitching, RAM expansion, and the DPC coprocessor
+12. **[Extending the Cartridge]({{< relref "/docs/cartridge-hardware" >}})** — bankswitching, RAM expansion, and the DPC coprocessor
 13. **[Hardware Quirks as Features]({{< relref "/docs/hardware-quirks" >}})** — bugs and side effects that became signature effects
 14. **[Game Analysis]({{< relref "/docs/game-analysis" >}})** — teardowns of classic games, starting with Combat
 15. **[Burning to EPROM & Real Hardware]({{< relref "/docs/burning-eprom" >}})** — getting your game onto a cartridge

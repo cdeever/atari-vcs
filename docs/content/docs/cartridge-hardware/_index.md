@@ -1,11 +1,11 @@
 ---
-title: "Extended Cartridge Hardware"
+title: "Extending the Cartridge"
 weight: 90
 bookCollapseSection: true
 BookIcon: advanced
 ---
 
-# Extended Cartridge Hardware
+# Extending the Cartridge
 
 In 1984, *Pitfall II: Lost Caverns* did something no 2600 game had done before: it shipped with **a second chip inside the cartridge** — a custom coprocessor that streamed the game's graphics and played three voices of continuous music while it ran. The console hadn't changed at all. The *cartridge* had grown a brain.
 
@@ -18,5 +18,3 @@ The escalation runs in three steps — more memory, then more processing:
 - **[The DPC]({{< relref "dpc" >}})** — Pitfall II's coprocessor, the far horizon: not just more memory but a chip that *computes*, doing work the CPU couldn't spare.
 
 Each escape costs something — a more complex cartridge, address space, or both — but each one buys a game room the bare console simply doesn't have.
-
-> Everything here is **cartridge** hardware. Pushing past the *two-sprite* limit needs no extra chips at all — it's a pure software trick, [Sprite Multiplexing]({{< relref "/docs/sprites/sprite-multiplexing" >}}), which lives with the [Sprites]({{< relref "/docs/sprites" >}}) chapter.

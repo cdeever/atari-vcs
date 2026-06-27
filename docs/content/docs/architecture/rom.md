@@ -21,7 +21,7 @@ That bare simplicity is also where the **2 KB vs. 4 KB** split comes from. A 4 K
 
 ## The 4 KB ceiling, and the two ways past the cartridge
 
-4 KB is the most the 6507 can address directly, because it has only [13 address lines]({{< relref "cpu" >}}) and just the top 4 KB reaches the cartridge. Going beyond that isn't a bigger flat ROM — it takes **extra hardware on the cartridge** to page more ROM through the same window, the subject of **[Extended Cartridge Hardware]({{< relref "/docs/cartridge-hardware" >}})**. And putting *any* image, banked or not, onto a physical chip you can plug into a real console is **[Burning to EPROM]({{< relref "/docs/burning-eprom" >}})** — which is really just swapping the factory's permanent mask ROM for one you can program yourself.
+4 KB is the most the 6507 can address directly, because it has only [13 address lines]({{< relref "cpu" >}}) and just the top 4 KB reaches the cartridge. Going beyond that isn't a bigger flat ROM — it takes **extra hardware on the cartridge** to page more ROM through the same window, the subject of **[Extending the Cartridge]({{< relref "/docs/cartridge-hardware" >}})**. And putting *any* image, banked or not, onto a physical chip you can plug into a real console is **[Burning to EPROM]({{< relref "/docs/burning-eprom" >}})** — which is really just swapping the factory's permanent mask ROM for one you can program yourself.
 
 ## Read-only, and why that matters
 
