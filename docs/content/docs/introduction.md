@@ -19,7 +19,7 @@ If you arrive here from modern software development, much of your hard-won insti
 | ~~Drivers~~ | **CRT** |
 | ~~Operating System~~ | *…and that's the whole machine* |
 
-<p style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:-0.5rem;"><em>Forget the abstractions — on the VCS, you become one with the machine.</em></p>
+<p style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:-0.5rem;"><em>Strip away the abstractions — on the VCS, your code talks directly to the hardware.</em></p>
 
 Take that less as a warning than as an invitation. Stripped of the abstractions, you get to see exactly what the machine is doing on every cycle — and that directness is the whole appeal.
 
