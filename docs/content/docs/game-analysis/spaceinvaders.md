@@ -60,6 +60,14 @@ LF694: LDA    SWCHB
 
 So the split is clean: the power-up **jump** is hardware (read two bytes at `$FFFC`, go); **everything after it — clearing memory, *and the Reset button itself* — is software.** Leave out the `SWCHB` poll and the Reset button does nothing at all. (The 6507 also exposes no NMI or IRQ pins, so the other two vectors are dead weight — which is why all three simply point at `$FE98`.)
 
+## Two shots, and a mystery
+
+There's a piece of folklore as old as the cartridge: **hold Game Reset as you switch the console on — power and reset at the same instant — and your cannon can fire *two* shots at once**, a second laser leaving the gun before the first has cleared. Players have passed the trick around for forty years; what nobody has cleanly pinned down is *why.*
+
+The place to hunt is the split just above. A real power-up runs `START`, which **scrubs all 128 bytes of RAM** before `LFEB2` builds a fresh game. The Game Reset button jumps straight to `LFEB2` — it rebuilds the formation, lives, and score, but **never re-runs that RAM-clearing loop.** So any variable `LFEB2` doesn't itself write keeps whatever it held a moment before. Catch the machine in the seam between those two paths — Reset asserted while power-on garbage is still sitting in memory — and the byte meant to gate your fire (only one missile aloft at a time) can come up in a state the game never planned for, and a second shot slips through.
+
+That's the *shape* of an answer, not the answer. Exactly which byte, and why power-and-reset-together lands it just so, is the kind of thing you settle only by reading the disassembly with the question in hand. Like [Cosmic Ark's starfield]({{< relref "cosmicark" >}}), it's an accidental behavior living in the gap between a hardware reset and the software meant to finish the job — and a standing invitation to go solve it.
+
 ## 36 invaders from two sprites
 
 A row in the arcade game is **six invaders** across. The 2600 has *two* player objects. So how does a single scanline band show six aliens?
@@ -175,6 +183,6 @@ Flip the **[Game Select switch]({{< relref "/docs/input/buttons-and-switches" >}
 
 ## Why read it
 
-Pitfall! and River Raid impress by *generating* a world. Space Invaders impresses by doing the opposite — taking the TIA's tiniest cast and making it look like a hundred things at once. Read it for the **`NUSIZ` copies + multiplexing** combination that turns two sprites into a 36-alien wall (there is no cleaner example), for the **BCD march** and its accidental **speed-up**, and for the **112-in-one** trick that wrings a hundred games from one kernel. And read it for what it *was*: the cartridge that sold the machine this whole book is about.
+Pitfall! and River Raid impress by *generating* a world. Space Invaders impresses by doing the opposite — taking the TIA's tiniest cast and making it look like a hundred things at once. Read it for the **`NUSIZ` copies + multiplexing** combination that turns two sprites into a 36-alien wall (there is no cleaner example), for the **BCD march** and its accidental **speed-up**, for the **112-in-one** trick that wrings a hundred games from one kernel, and for a **forty-year-old mystery** — the power-on-plus-Reset *two-shot* glitch, still waiting in the disassembly for someone to explain it cleanly. And read it for what it *was*: the cartridge that sold the machine this whole book is about.
 
 > **Read the source.** This teardown is drawn from a [DiStella]({{< relref "/docs/getting-started/toolchain" >}}) disassembly of the *Space Invaders* cartridge (Rick Maurer's game, © 1980 Atari). Disassemble your own copy with `distella -a -s` to follow along — see the [Toolchain]({{< relref "/docs/getting-started/toolchain" >}}) chapter.

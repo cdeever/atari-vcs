@@ -40,7 +40,7 @@ The whole galaxy is **one missile.** It's enabled once, as an ordinary object:
        STA    ENAM0      ; turn missile 0 on — this is "the stars"
 ```
 
-A missile can be drawn in exactly *one* place per scanline. To get a whole row of stars out of it, Cosmic Ark abuses [horizontal positioning]({{< relref "/docs/sprites/horizontal-positioning" >}}). Normally you set a motion value in `HMM0` and *then* strobe `HMOVE`, and the object slides over once during the next blanking interval. Fulop does it **backwards and badly on purpose** — strobe `HMOVE` first, then write `HMM0` while the TIA is still in the middle of applying the motion:
+A missile can be drawn in exactly *one* place per scanline. To get a whole row of stars out of it, Cosmic Ark abuses [horizontal positioning]({{< relref "/docs/sprites/horizontal-positioning" >}}). Normally you set a motion value in `HMM0` and *then* strobe `HMOVE`, and the object slides over once during the next blanking interval. Fulop does it **backwards and badly on purpose** — strobe `HMOVE` first, then write `HMM0` while the TIA is still in the middle of applying the motion, mid-way through the [**HMOVE comb**]({{< relref "/docs/sprites/horizontal-positioning#the-hmove-comb-and-clearing" >}}) the strobe sets off:
 
 ```asm
        STA    WSYNC

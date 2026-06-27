@@ -5,7 +5,7 @@ weight: 30
 
 # Adventure (1980)
 
-*Adventure* — **Warren Robinett**, Atari — put an entire **explorable world** on the console: roughly thirty connected rooms, items you carry one at a time, three dragons that hunt you, a thieving bat, locked castles with keys. It was the first action-adventure on a home system, and it's famous for two firsts at once — a whole world on a 4 KB cart, and the **first Easter egg** in a video game.
+*Adventure* — **Warren Robinett**, Atari — put an entire **explorable world** on the console: roughly thirty connected rooms, items you carry one at a time, three dragons that hunt you, a thieving bat, and locked castles opened with keys. It was the first action-adventure game on a home console, packing an astonishingly rich world into a 4 KB cartridge. It's also famous for its hidden **"Created by Warren Robinett" room** — widely regarded as the first *famous* Easter egg in a video game, and the one that popularized the tradition of hiding secrets for players to find.
 
 It's the perfect foil to [Pitfall!]({{< relref "pitfall" >}}). Pitfall's 255 rooms are *computed* from a single byte; Adventure's thirty are *stored* as a hand-authored map — and on top of that map Robinett built a general **object system** that makes Adventure read less like a single program and more like a tiny world simulation.
 
@@ -57,9 +57,9 @@ The hardware draws the famous line: two [players]({{< relref "/docs/sprites/draw
 
 The world's actors each get their own mover: `MoveRedDragon`, `MoveYellowDragon`, `MoveGreenDragon` run three small state machines that wander, chase, bite, and die; `MoveBat` sends the bat flitting about to steal and swap whatever objects it fancies (it will happily fly a dragon to your doorstep). Add the carry-one-thing mechanic (`$9D`) and the key-locked castle gates (`Portals`), and none of these systems *know* about each other — yet they collide into stories. That emergent, anything-can-happen quality is exactly what made Adventure feel alive, and it falls out of the uniform object model almost for free. (Game variation 3 even reshuffles every object's starting room, so no two playthroughs match.)
 
-## The first Easter egg
+## The famous Easter egg
 
-Hidden in the world is an **invisible one-pixel object** — the famous "gray dot." Find it (it sits unseen in a particular room), carry it to the right spot, and a wall that's always been solid lets you slip into a secret room displaying **"Created by Warren Robinett."** It was the first credited Easter egg in any video game — Atari didn't put programmers' names on boxes, so Robinett hid his in the game itself. The fitting part, for this teardown: the egg is *just another object* in the same table, with its own room and its own rules. The object model that built the world also smuggled in its signature. (Compare the signature-effects spirit of [Hardware Quirks]({{< relref "/docs/hardware-quirks" >}}).)
+Hidden in the world is an **invisible one-pixel object** — the famous "gray dot." Find it (it sits unseen in a particular room), carry it to the right spot, and a wall that's always been solid lets you slip into a secret room displaying **"Created by Warren Robinett."** Atari didn't put programmers' names on boxes, so Robinett hid his in the game itself — and once players found it, it became the most celebrated secret in early gaming, the room that popularized the whole tradition of hiding "Easter eggs." The fitting part, for this teardown: the egg is *just another object* in the same table, with its own room and its own rules. The object model that built the world also smuggled in its signature. (Compare the signature-effects spirit of [Hardware Quirks]({{< relref "/docs/hardware-quirks" >}}).)
 
 ## Why read it
 
