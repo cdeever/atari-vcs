@@ -8,16 +8,22 @@ BookIcon: intro
 
 If you arrive here from modern software development, much of your hard-won instinct will work *against* you. The things a career is built on — rich standard libraries, layers of hardware abstraction, portable code that runs anywhere — none of it exists on the VCS. There is no operating system to call, no driver sitting between you and the silicon, and nothing you write will run on any machine but this one. As a certain Jedi master would put it:
 
-> "You must unlearn what you have learned."
+> *"You must unlearn what you have learned."*
+
+What does that unlearning look like? Underneath, the whole Atari is just **four main chips** — four integrated circuits — plus the television they drive. Nearly every layer a modern program stands on simply isn't here; strike those out, and what's left is the bare metal:
+
+<div class="center-table">
 
 | Modern Programming | VCS/2600 Programming |
 |---|---|
-| ~~Cloud APIs~~ | **6507 CPU** |
-| ~~Containers~~ | **TIA** |
-| ~~Frameworks~~ | **RIOT** |
-| ~~Standard Libraries~~ | **Program ROM** |
-| ~~Drivers~~ | **CRT** |
-| ~~Operating System~~ | *…and that's the whole machine* |
+| ~~Cloud APIs~~ | **6507** — the CPU |
+| ~~Containers~~ | **TIA** — Television Interface Adapter (video & sound) |
+| ~~Frameworks~~ | **RIOT** — RAM, I/O & timer (a 6532) |
+| ~~Standard Libraries~~ | **Program ROM** — your cartridge |
+| ~~Drivers~~ | **CRT** — the television itself |
+| ~~Operating System~~ | *four chips and a TV — that's the whole machine* |
+
+</div>
 
 <p style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:-0.5rem;"><em>Strip away the abstractions — on the VCS, your code talks directly to the hardware.</em></p>
 

@@ -108,6 +108,22 @@
 }
 
 // -----------------------------------------------------------------------------
+// Centered markdown tables — wrap the table in <div class="center-table">
+// (the theme makes tables display:block / full-width by default)
+// -----------------------------------------------------------------------------
+
+.book-page .center-table {
+  text-align: center;
+
+  table {
+    display: inline-table;   // shrink-wrap to content so it can be centered
+    width: auto;
+    text-align: left;        // keep cell text left-aligned
+    margin: 1rem auto;
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Interactive canvas animations (vcs-anim.js)
 // -----------------------------------------------------------------------------
 
