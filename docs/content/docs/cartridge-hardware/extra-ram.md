@@ -9,7 +9,7 @@ The console gives you **128 bytes** of [RAM]({{< relref "/docs/architecture/riot
 
 ## Cartridge RAM, and the two-port trick
 
-The best-known add-on is the **"Superchip"** — 128 extra bytes (some carts more) of RAM riding on the cartridge, mapped into the bottom of the [cart window]({{< relref "/docs/architecture/rom" >}}). But cartridge RAM has a wrinkle the console RAM doesn't: the cartridge connector has **no clean read/write signal** the chip can use to tell a load from a store in time. So cartridge RAM is split across **two address ranges — a write port and a read port:**
+The best-known add-on is Atari's **"Superchip"** — 128 extra bytes (some carts more) of RAM riding on the cartridge, mapped into the bottom of the [cart window]({{< relref "/docs/architecture/rom" >}}). Atari shipped it in a run of mid-1980s titles — *Dig Dug*, *Crystal Castles*, *Off the Wall*, *Secret Quest* — most of which [bankswitch]({{< relref "bankswitching" >}}) as well. But cartridge RAM has a wrinkle the console RAM doesn't: the cartridge connector has **no clean read/write signal** the chip can use to tell a load from a store in time. So cartridge RAM is split across **two address ranges — a write port and a read port:**
 
 - **Write** a byte by storing to the *write-port* address.
 - **Read** it back from the *read-port* address, a fixed offset higher.

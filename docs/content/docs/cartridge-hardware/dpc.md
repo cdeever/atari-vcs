@@ -1,11 +1,13 @@
 ---
-title: "The DPC: A Chip in the Cartridge"
+title: "The DPC: A Coprocessor in the Cartridge"
 weight: 30
 ---
 
-# The DPC: A Chip in the Cartridge
+# The DPC: A Coprocessor in the Cartridge
 
 [Bankswitching]({{< relref "bankswitching" >}}) adds ROM and the [Superchip]({{< relref "extra-ram" >}}) adds RAM, but both are still just *memory* — passive storage the CPU does all the work against. *Pitfall II: Lost Caverns* (1984) took the idea to its conclusion: **David Crane** designed a custom chip, the **DPC** — officially the *Display Processor Chip*, though the initials are also his own (David Patrick Crane) — and built it into the cartridge. It was the first — and in the commercial 2600 era, essentially the only — game cartridge with a coprocessor of its own. The console did nothing new; the cart did the new thing.
+
+The DPC marks the **birth of the smart cartridge.** Until then, cartridges simply stored more code and data — they could make the 6507's job easier with more [ROM]({{< relref "bankswitching" >}}) or [RAM]({{< relref "extra-ram" >}}), but they never performed work themselves. The DPC crossed that line: for the first time the cartridge became an *active participant* in running the game, with dedicated hardware doing specialized tasks while the 6507 stayed focused on gameplay. The cartridge had become a **co-processor.**
 
 ## Data fetchers: streaming graphics without the CPU
 
@@ -19,9 +21,9 @@ The [TIA]({{< relref "/docs/architecture/programming-the-television" >}}) has [t
 
 (The DPC still uses [bankswitching]({{< relref "bankswitching" >}}) underneath for its ROM — the coprocessor sits alongside the paging logic, not instead of it.)
 
-## Why it belongs at the end of this chapter
+## The first smart cartridge — not the last
 
-Every other escape in this chapter expands what the hardware *has* — more ROM, more RAM. The DPC expands what the cartridge *does*: it offloads computation, the one thing a passive chip never could. That makes it the natural horizon of "put hardware on the cart," and the bridge to the modern era — today's homebrew carts (the Harmony/Melody boards and their **DPC+**/CDF formats) carry a full ARM processor that emulates the original DPC and goes much further, running game logic the 6507 never touches.
+Every escape before the DPC expanded what the hardware *has* — more ROM, more RAM. The DPC expanded what the cartridge *does*: it offloaded computation, the one thing a passive chip never could. Commercially it was a dead end — almost nothing else ever used it — but the *idea* didn't die. Decades on, it comes back at a scale Crane couldn't have built in 1984: a cartridge carrying its own [ARM processor]({{< relref "arm-cartridges" >}}), emulating the DPC and going far, far beyond it.
 
 ## In Practice
 

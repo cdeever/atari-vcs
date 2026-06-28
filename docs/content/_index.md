@@ -116,14 +116,6 @@ Cycle counting, precise waiting, multi-line kernels, and front-loading — the c
 
 <div class="section-card">
 
-### [Extending the Cartridge]({{< relref "/docs/cartridge-hardware" >}})
-
-Bankswitching past 4K, RAM expansion, and the DPC coprocessor — lifting the machine's limits with hardware on the cartridge.
-
-</div>
-
-<div class="section-card">
-
 ### [Hardware Quirks as Features]({{< relref "/docs/hardware-quirks" >}})
 
 How Cosmic Ark's starfield, Yars' Revenge's neutral zone, and sprite flicker turned bugs and limits into signature effects.
@@ -143,6 +135,14 @@ Block-diagram teardowns of classic games — starting with Combat, whose structu
 ### [Burning to EPROM & Real Hardware]({{< relref "/docs/burning-eprom" >}})
 
 Choosing a chip, preparing the ROM image, wiring the cartridge, and the bugs that only appear on a real console.
+
+</div>
+
+<div class="section-card">
+
+### [Extending the Cartridge]({{< relref "/docs/cartridge-hardware" >}})
+
+From bankswitching to ARM cartridges — the cartridge's evolution from dumb storage to smart silicon, and the closing debate over whether to extend at all.
 
 </div>
 

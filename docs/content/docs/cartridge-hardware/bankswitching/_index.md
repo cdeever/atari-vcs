@@ -1,6 +1,7 @@
 ---
 title: "Bankswitching"
 weight: 10
+bookCollapseSection: true
 ---
 
 # Bankswitching
@@ -39,12 +40,12 @@ Here is the part that surprises everyone: **there is no "switch bank" instructio
 
 The standard Atari schemes are named for their hotspot addresses up near the top of the window:
 
-| Scheme | ROM | Banks | Hotspots |
-|--------|-----|-------|----------|
-| **F8** | 8 KB | 2 | `$1FF8`, `$1FF9` |
-| **F6** | 16 KB | 4 | `$1FF6`–`$1FF9` |
-| **F4** | 32 KB | 8 | `$1FF4`–`$1FFB` |
-| **3F** | up to 512 KB | many | a write to `$3F` (Tigervision) |
+| Scheme | ROM | Banks | Hotspots | Seen in |
+|--------|-----|-------|----------|---------|
+| **F8** | 8 KB | 2 | `$1FF8`, `$1FF9` | *Asteroids* (1981) — the first banked cart |
+| **F6** | 16 KB | 4 | `$1FF6`–`$1FF9` | *Crystal Castles*, *Dig Dug* |
+| **F4** | 32 KB | 8 | `$1FF4`–`$1FFB` | *Fatal Run* — the largest official Atari cart |
+| **3F** | up to 512 KB | many | a write to `$3F` (Tigervision) | *Miner 2049er* |
 
 (Others exist — E0, FE, 3E, and more — but F8/F6/F4 cover most Atari-era carts.)
 
