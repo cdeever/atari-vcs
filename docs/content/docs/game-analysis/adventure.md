@@ -45,6 +45,16 @@ This is the whole contrast with Pitfall, and it's a fundamental one. Two answers
 
 Adventure spends the bytes to be *designed*.
 
+## The hard direction: knowing where you are sideways
+
+Swapping rooms sounds symmetric — walk off any edge, load the neighbor — but the two axes are not equal on this machine, and in *Racing the Beam* Montfort and Bogost single out exactly this asymmetry as one of Robinett's real headaches. The VCS practically hands you the **vertical** coordinate: the kernel draws the screen top to bottom one line at a time, so a running tally of `WSYNC`s *is* your Y. Counting [scanlines]({{< relref "/docs/tia-racing-the-beam" >}}) is the natural unit of the whole machine, and "have I crossed the top or bottom of the room?" is just a comparison against a line number you already have.
+
+**Horizontal** is the opposite, and it's a hardware fact, not a Robinett oversight: there is no register that reports where the beam is across a scanline, and no register that holds a sprite's X. You [position a sprite by *timing*]({{< relref "/docs/sprites/horizontal-positioning" >}}) — strobing `RESBL`/`RESP0` to wherever the beam happens to be, then nudging with `HMOVE` — and the hardware never tells you afterward where it landed. The machine measures the vertical axis *for* you and leaves the horizontal axis entirely as the programmer's bookkeeping.
+
+So the avatar's X lives in software. The man is just a three-byte record in RAM — `$8A` current room, `$8B` X, `$8C` Y — the *same* `{room, X, Y}` placement triple every object in the world uses (the disassembly even points at it with `LDX #$8A` / "*point to ball's coordinates*"). Robinett advances or retreats `$8B` himself each frame from the joystick, and every frame re-derives the timed strobe that draws the [ball]({{< relref "/docs/sprites/missiles-and-ball" >}}) at that column — there is no shortcut where the hardware "remembers" the player's horizontal place between frames. And the left/right room crossing that looks so casual in the diagram is really `$8B` reaching a hand-chosen edge value: with no horizontal counter to lean on, *every* sideways boundary in the world is a number Robinett had to maintain and test himself, where the vertical `$8C` comparisons largely ride along on the beam he was already counting.
+
+This is the quiet cost behind "a world larger than the screen." Building rooms that connect *up and down* leans on the grain of the machine; building rooms that connect *left and right* meant simulating, in 128 bytes of RAM, the one measurement the TIA refuses to give back.
+
 ## Objects as data: the first "object-oriented" game
 
 Here's the part programmers still cite. The sword, the chalice, the keys, the bridge, the magnet, the three dragons, the bat, the castle gates — Adventure treats *all* of them as **objects** handled the same way. Parallel tables (`Store1`–`Store9`) hold each object's graphic, state pointers, color, and size; a separate array gives each object's *placement* — its room, X, and Y. And the routines that act on them are **generic**: `CacheObjects` finds which objects are standing in the current room, `SetupObjectPrint` readies one for the screen, `GetObjectState` walks its little state machine. There's no special code for "the sword" — there's code for "an object," run over a list.
