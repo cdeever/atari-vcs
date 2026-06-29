@@ -173,6 +173,8 @@ LF4E1: LDA    $E8,X     ; formation position (low)
 
 When the column reaches a screen edge, the velocity flips sign and the whole formation **drops a row** — the relentless left-right-down sweep that defines the game. Keeping the position in BCD makes the on-screen movement line up cleanly with the decimal bookkeeping the rest of the game uses (lives, score).
 
+This accumulator is also a textbook case of a limitation [Adventure leans on hard]({{< relref "adventure" >}}): the TIA has no register that reports an object's horizontal position, so a game that needs to know where something *is* across the screen — and to notice when it hits an edge — has to keep that number itself. Space Invaders keeps it in BCD; the march is that bookkeeping made visible.
+
 ## Faster as they fall
 
 The game's signature tension is that the aliens **speed up as you destroy them**. In the original arcade machine this was a famous *accident* — fewer invaders meant less for the draw loop to do, so the survivors were updated more often and appeared to accelerate. Maurer preserves the feel on the 2600: as the ranks thin, the formation's march quickens, so the last lonely invader skitters across the screen at a panic-inducing clip. It's [emergent difficulty]({{< relref "/docs/kernel-techniques/counting-cycles" >}}) — a curve that nobody had to design, falling straight out of "draw what's left."
