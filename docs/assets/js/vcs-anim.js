@@ -1058,17 +1058,45 @@
   // runs — coarse, landing only near every ~15th color clock. HMP0 (a signed
   // nudge, +7 left to -8 right) plus STA HMOVE slides it the final few clocks.
   // HMOVE also blanks the leftmost 8 pixels: the "HMOVE comb."
+  //
+  // The strip shows a whole scanline: the first 68 color clocks are HBLANK (no
+  // picture), then 160 visible clocks. An ASM panel shows the canonical
+  // SetHorizPos routine, highlighting the line the beam is currently "running."
   // ===========================================================================
   VCSAnim.register("resp0-hmove", function (api) {
-    var CLOCKS = 152;   // visible span we let the sprite roam
-    var STEP = 15;      // coarse granularity (~every 15th clock)
+    var HBLANK = 68;            // color clocks of horizontal blank (no picture)
+    var VIS = 160;             // visible color clocks on a scanline
+    var LINE = HBLANK + VIS;   // 228 total
+    var STEP = 15;             // coarse granularity (~every 15th clock)
     var SPRITE_W = 8;
+
+    // The canonical positioning routine, mirrored in the page text.
+    var ASM = [
+      "        sta WSYNC",
+      "        sec",
+      ".Div15  sbc #15",
+      "        bcs .Div15",
+      "        sta HMP0,x",
+      "        sta RESP0,x",
+      "        sta WSYNC",
+      "        sta HMOVE",
+    ];
+    var CMT = [
+      "start of line — enter HBLANK",
+      "set carry for the subtraction",
+      "burn 5 cyc = 15 clocks / pass",
+      "loop until the byte goes negative",
+      "fine offset (from the remainder)",
+      "STROBE — snap to the coarse slot",
+      "wait to the next line",
+      "apply the fine nudge",
+    ];
 
     return {
       duration: 5,
-      height: 300,
+      height: 360,
       controls: [
-        { id: "strobe", label: "Strobe cycle", min: 0, max: CLOCKS, step: 1, value: 60 },
+        { id: "strobe", label: "Strobe cycle (in visible)", min: 0, max: VIS, step: 1, value: 60 },
         { id: "hmp0",   label: "HMP0 (+left/−right)", min: -8, max: 7, step: 1, value: 0 },
       ],
       draw: function (ctx, t, p) {
@@ -1077,12 +1105,13 @@
         var accent = c.accent, ok = c.dark ? "#33ff66" : "#1f8a3b";
         var pad = 18;
         var stripX = pad, stripW = W - pad * 2;
-        function px(clk) { return stripX + (clk / CLOCKS) * stripW; }
+        function px(clk) { return stripX + (clk / LINE) * stripW; }  // absolute clock
+        function visPx(v) { return px(HBLANK + v); }                 // visible-relative
 
-        var strobe = Math.round(p.strobe || 0);
+        var strobe = Math.round(p.strobe || 0);               // 0..VIS, in visible
         var hmp0 = Math.round(p.hmp0 || 0);
         var coarse = Math.round(strobe / STEP) * STEP;        // snap to ~15th
-        var finalClk = Math.max(0, Math.min(CLOCKS, coarse - hmp0)); // +HMP0 = left
+        var finalVis = Math.max(0, Math.min(VIS, coarse - hmp0)); // +HMP0 = left
         var usedHmove = hmp0 !== 0;
 
         ctx.fillStyle = c.subtle;
@@ -1094,75 +1123,115 @@
         ctx.fillText("Position by timing: strobe RESP0, then nudge with HMOVE", pad, 22);
 
         // --- the scanline strip ------------------------------------------
-        var stripY = 70, stripH = 56;
+        var stripY = 72, stripH = 50;
         ctx.fillStyle = c.dark ? "#000" : "#0a0f0a";
         ctx.fillRect(stripX, stripY, stripW, stripH);
+
+        // HBLANK band (no picture) at the left of every line
+        var hbW = (HBLANK / LINE) * stripW;
+        ctx.fillStyle = c.dark ? "#2a1f1f" : "#1c1414";
+        ctx.fillRect(stripX, stripY, hbW, stripH);
         ctx.strokeStyle = c.muted;
         ctx.strokeRect(stripX + 0.5, stripY + 0.5, stripW - 1, stripH - 1);
+        // boundary between HBLANK and the visible line
+        ctx.strokeStyle = accent; ctx.globalAlpha = 0.45;
+        ctx.beginPath(); ctx.moveTo(visPx(0), stripY - 4); ctx.lineTo(visPx(0), stripY + stripH); ctx.stroke();
+        ctx.globalAlpha = 1;
+        // labels for the two regions
+        ctx.fillStyle = c.muted; ctx.font = "9px system-ui, sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("HBLANK · 68 clk", stripX + hbW / 2, stripY + stripH / 2 - 2);
+        ctx.fillText("(no picture)", stripX + hbW / 2, stripY + stripH / 2 + 9);
+        ctx.textAlign = "left";
+        ctx.fillText("visible · 160 clocks", visPx(4), stripY + 11);
 
-        // coarse landing ticks every 15 clocks
+        // coarse landing ticks every 15 clocks across the visible region
         ctx.strokeStyle = c.border; ctx.globalAlpha = 0.6;
-        for (var k = 0; k <= CLOCKS; k += STEP) {
-          ctx.beginPath(); ctx.moveTo(px(k), stripY + stripH - 8); ctx.lineTo(px(k), stripY + stripH); ctx.stroke();
+        for (var k = 0; k <= VIS; k += STEP) {
+          ctx.beginPath(); ctx.moveTo(visPx(k), stripY + stripH - 8); ctx.lineTo(visPx(k), stripY + stripH); ctx.stroke();
         }
         ctx.globalAlpha = 1;
 
-        // HMOVE comb: leftmost 8 pixels blanked when HMOVE is used
+        // HMOVE comb: leftmost 8 *visible* pixels blanked when HMOVE is used
         if (usedHmove) {
-          var combW = (SPRITE_W / CLOCKS) * stripW;
+          var combW = (SPRITE_W / LINE) * stripW;
           ctx.fillStyle = c.dark ? "#1a1a1a" : "#000";
           for (var n = 0; n < 4; n++) {
-            ctx.fillRect(stripX + (n / 4) * combW, stripY, (combW / 4) * 0.6, stripH);
+            ctx.fillRect(visPx(0) + (n / 4) * combW, stripY, (combW / 4) * 0.6, stripH);
           }
           ctx.fillStyle = c.muted; ctx.font = "9px system-ui, sans-serif"; ctx.textAlign = "left";
-          ctx.fillText("HMOVE comb", stripX + combW + 3, stripY + stripH - 4);
+          ctx.fillText("comb", visPx(0) + combW + 3, stripY + stripH - 4);
         }
 
         // --- beam sweep; RESP0 fires when the beam reaches the strobe ----
-        var beamClk = t * CLOCKS;
-        var fired = beamClk >= strobe;
+        var beamClk = t * LINE;                       // absolute clocks
+        var strobeAbs = HBLANK + strobe;
+        var fired = beamClk >= strobeAbs;
         ctx.strokeStyle = accent; ctx.globalAlpha = 0.5;
         ctx.beginPath(); ctx.moveTo(px(beamClk), stripY - 6); ctx.lineTo(px(beamClk), stripY + stripH + 6); ctx.stroke();
         ctx.globalAlpha = 1;
         // strobe marker
         ctx.strokeStyle = accent; ctx.setLineDash([3, 2]);
-        ctx.beginPath(); ctx.moveTo(px(strobe), stripY - 10); ctx.lineTo(px(strobe), stripY + stripH); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(visPx(strobe), stripY - 10); ctx.lineTo(visPx(strobe), stripY + stripH); ctx.stroke();
         ctx.setLineDash([]);
         ctx.fillStyle = accent; ctx.font = "9px system-ui, sans-serif"; ctx.textAlign = "center";
-        ctx.fillText("STA RESP0", px(strobe), stripY - 12);
-        if (fired && beamClk < strobe + 12) {
+        ctx.fillText("STA RESP0", visPx(strobe), stripY - 12);
+        if (fired && beamClk < strobeAbs + 12) {
           ctx.fillStyle = accent; ctx.font = "bold 11px system-ui, sans-serif";
-          ctx.fillText("snap!", px(strobe), stripY + stripH + 16);
+          ctx.fillText("snap!", visPx(strobe), stripY + stripH + 16);
         }
 
         // --- sprites: coarse ghost + final, with nudge arrow ------------
-        function drawSprite(clk, alpha, color) {
+        function drawSprite(v, alpha, color) {
           ctx.globalAlpha = alpha; ctx.fillStyle = color;
-          ctx.fillRect(px(clk), stripY + 12, (SPRITE_W / CLOCKS) * stripW, stripH - 24);
+          ctx.fillRect(visPx(v), stripY + 14, (SPRITE_W / LINE) * stripW, stripH - 26);
           ctx.globalAlpha = 1;
         }
         if (fired) drawSprite(coarse, 0.4, c.muted);   // coarse landing (ghost)
-        drawSprite(finalClk, 1, ok);                    // final position
+        drawSprite(finalVis, 1, ok);                    // final position
 
         // nudge arrow coarse -> final
-        if (fired && coarse !== finalClk) {
+        if (fired && coarse !== finalVis) {
           var y = stripY + stripH / 2;
           ctx.strokeStyle = accent; ctx.lineWidth = 1.5;
-          ctx.beginPath(); ctx.moveTo(px(coarse) + 3, y); ctx.lineTo(px(finalClk) + 3, y); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(visPx(coarse) + 3, y); ctx.lineTo(visPx(finalVis) + 3, y); ctx.stroke();
           ctx.lineWidth = 1;
         }
 
         // --- readout -----------------------------------------------------
-        var ry = stripY + stripH + 40;
+        var ry = stripY + stripH + 36;
         ctx.textAlign = "left"; ctx.font = "12px ui-monospace, Menlo, monospace";
         ctx.fillStyle = c.muted;
         ctx.fillText("coarse (RESP0): clock " + coarse + "   (≈ every " + STEP + "th)", pad, ry);
         ctx.fillStyle = ok;
         var dir = hmp0 > 0 ? "left" : (hmp0 < 0 ? "right" : "—");
         ctx.fillText("HMP0 = " + (hmp0 >= 0 ? "+" : "") + hmp0 + "  →  nudge " + dir +
-          "  →  final clock " + finalClk, pad, ry + 20);
-        ctx.fillStyle = c.muted; ctx.font = "10px system-ui, sans-serif";
-        ctx.fillText("Positive HMP0 moves left, negative moves right — the most-flipped sign in VCS code.", pad, ry + 40);
+          "  →  final clock " + finalVis, pad, ry + 18);
+
+        // --- ASM panel; the highlighted line tracks the beam phase -------
+        var activeIdx;
+        if (!fired) activeIdx = 2;                          // still in the divide loop
+        else if (beamClk < strobeAbs + 14) activeIdx = 5;  // the RESP0 strobe
+        else if (usedHmove) activeIdx = 7;                 // applying HMOVE
+        else activeIdx = -1;
+
+        var codeTop = ry + 40, lineH = 15;
+        ctx.font = "bold 10px system-ui, sans-serif"; ctx.fillStyle = c.muted; ctx.textAlign = "left";
+        ctx.fillText("SetHorizPos:   ; A = X (0..159), X = object #", pad, codeTop);
+        ctx.font = "11px ui-monospace, Menlo, monospace";
+        var cmtX = pad + Math.max(150, stripW * 0.44);
+        for (var i = 0; i < ASM.length; i++) {
+          var yy = codeTop + 16 + i * lineH;
+          if (i === activeIdx) {
+            ctx.globalAlpha = 0.18; ctx.fillStyle = accent;
+            ctx.fillRect(pad - 4, yy - 11, stripW + 8, lineH - 1);
+            ctx.globalAlpha = 1;
+          }
+          var cur = i === activeIdx;
+          ctx.fillStyle = cur ? accent : (c.dark ? "#d8d2c6" : "#2a261f");
+          ctx.fillText(ASM[i], pad, yy);
+          ctx.fillStyle = c.muted;
+          ctx.fillText("; " + CMT[i], cmtX, yy);
+        }
       },
     };
   });

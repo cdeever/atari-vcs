@@ -67,7 +67,7 @@ SetHorizPos:               ; A = X position (0..159), X = object # (0 = P0)
 
 This is the routine almost every game carries in some form (it traces back to the *Battlezone* cartridge). One call, run during [VBLANK]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}), and the object is pixel-exact.
 
-{{< vcsanim scene="resp0-hmove" caption="Move *Strobe cycle* and the sprite snaps to the nearest coarse slot; then *HMP0* nudges it the last few clocks (positive = left). Any nudge lights up the HMOVE comb at the left edge." >}}
+{{< vcsanim scene="resp0-hmove" caption="The strip is a whole scanline — the shaded **HBLANK** (68 clocks, no picture) then the 160 visible clocks. Move *Strobe cycle* and the sprite snaps to the nearest coarse slot; then *HMP0* nudges it the last few clocks (positive = left). Any nudge lights up the HMOVE comb at the start of the visible line. The code panel highlights the line the beam is currently running." >}}
 
 > **The sign is the single most-flipped detail in VCS programming.** By the usual convention a *positive* `HMxx` value moves the object **left** and a *negative* value moves it **right** (`$70` = +7 left, `$80` = −8 right). It's worth confirming the direction against your `vcs.h` constants and watching it in Stella rather than trusting memory.
 
