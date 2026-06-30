@@ -13,6 +13,18 @@ Writing to `RESP0` is a [strobe]({{< relref "/docs/prerequisites/memory-mapped" 
 
 But the resolution is coarse. The CPU ticks once for every [three color clocks]({{< relref "/docs/6502-basics/cycles-and-timing" >}}), and the tightest positioning loop costs five cycles per iteration — so a timed strobe can only land the sprite on roughly **every 15th pixel**. That gets you close, never exact.
 
+The whole "loop burns time, then strobe" idea fits in a few lines. With the desired column in `A`, divide it by 15 by repeated subtraction — and the loop's own running time *is* the positioning:
+
+```
+        sta WSYNC          ; align to the start of a scanline (beam at far left)
+        sec
+.Div15  sbc #15            ; 2 cycles ─┐  5 cycles = 15 color clocks per pass,
+        bcs .Div15         ; 3 cycles ─┘  so each pass walks one coarse slot
+        sta RESP0          ; strobe: P0 snaps to wherever the beam reached
+```
+
+That lands P0 within ~15 pixels of the target — the right *slot*, not yet the right pixel. Closing that last gap is Step two.
+
 {{< graphviz >}}
 digraph pos {
   rankdir=LR;
@@ -32,6 +44,28 @@ digraph pos {
 The gap between those coarse landing spots is closed by the **fine-motion** registers. `HMP0` holds a signed 4-bit value in its high nibble — a nudge of **+7 to −8 color clocks** — and writing to `HMOVE` applies the fine offsets of *all* the movable objects at once, shifting each by its `HMxx` amount.
 
 So the full move is two steps: strobe `RESP0` to the nearest coarse slot, set `HMP0` to the leftover distance, then `STA HMOVE` to slide the sprite the final few pixels. The classic routine computes both at once — a divide-by-15 of the target column gives the coarse strobe timing, and the remainder becomes the `HMP0` fine value.
+
+It's the same divide loop as above, with the leftover remainder turned into a fine offset. Indexing every store by `X` (the object number, `0` = P0) makes one routine serve all five objects — `HMP0`/`RESP0` sit at the head of their register runs:
+
+```
+SetHorizPos:               ; A = X position (0..159), X = object # (0 = P0)
+        sta WSYNC          ; line up to the start of a scanline
+        sec
+.Div15  sbc #15            ; divide by 15 — the loop time sets the coarse slot
+        bcs .Div15
+        eor #7             ; turn the remainder into a signed 4-bit fine offset
+        asl
+        asl
+        asl
+        asl                ; shift it up into HMxx's high nibble
+        sta HMP0,x         ; stash the fine nudge for this object
+        sta RESP0,x        ; coarse strobe: snap to the nearest 15-clock slot
+        sta WSYNC
+        sta HMOVE          ; apply the fine nudge — exact pixel
+        rts
+```
+
+This is the routine almost every game carries in some form (it traces back to the *Battlezone* cartridge). One call, run during [VBLANK]({{< relref "/docs/tia-racing-the-beam/frame-structure" >}}), and the object is pixel-exact.
 
 {{< vcsanim scene="resp0-hmove" caption="Move *Strobe cycle* and the sprite snaps to the nearest coarse slot; then *HMP0* nudges it the last few clocks (positive = left). Any nudge lights up the HMOVE comb at the left edge." >}}
 
