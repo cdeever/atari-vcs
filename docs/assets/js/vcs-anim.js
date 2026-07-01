@@ -642,9 +642,24 @@
     var CELLS = 20;                      // playfield columns per half
 
     function regOf(col) { return col < 4 ? "PF0" : (col < 12 ? "PF1" : "PF2"); }
-    // distinct left/right patterns so the halves clearly differ
-    function leftLit(row, col) { return ((col + row) % 4) < 2; }   // diagonal
-    function rightLit(row, col) { return (col % 4) < 2; }          // vertical bars
+
+    // Game-like silhouettes so the two halves clearly differ — the sort of
+    // thing a real playfield draws. Left: a mountain range (filled from the
+    // bottom up to a jagged skyline). Right: a few clouds floating in the sky.
+    var MTN = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 2, 3, 4, 5, 4, 3, 2, 1, 1, 1]; // height 0..6 per col
+    var CLOUDS = [                                  // ellipse blobs (col, row centers)
+      { x: 4, y: 1, rx: 3.0, ry: 1.3 },
+      { x: 14, y: 1, rx: 3.5, ry: 1.3 },
+      { x: 9, y: 3, rx: 2.5, ry: 1.1 },
+    ];
+    function leftLit(row, col) { return row >= ROWS - MTN[col]; }   // mountains
+    function rightLit(row, col) {                                   // clouds
+      for (var i = 0; i < CLOUDS.length; i++) {
+        var d = CLOUDS[i], dx = (col - d.x) / d.rx, dy = (row - d.y) / d.ry;
+        if (dx * dx + dy * dy <= 1) return true;
+      }
+      return false;
+    }
     function clampIdx(x) { return Math.max(0, Math.min(ASM_L.length - 1, x)); }
 
     return {
