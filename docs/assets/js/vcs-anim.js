@@ -91,6 +91,7 @@
     var colors = readColors();
     var api = { colors: colors };
     var scene = factory(api);
+    var isStatic = !!scene.static;   // static scenes: no play button, sliders, or loop
 
     var heightAttr = parseInt(host.getAttribute("data-height"), 10);
     var cssHeight = heightAttr > 0 ? heightAttr : (scene.height || 360);
@@ -116,17 +117,15 @@
       api.height = H;
     }
 
-    // --- Controls ------------------------------------------------------------
-    var controls = document.createElement("div");
-    controls.className = "vcs-anim-controls";
-    host.appendChild(controls);
-
-    var playing = !reduceMotion;
-
-    var playBtn = document.createElement("button");
-    playBtn.type = "button";
-    playBtn.className = "vcs-anim-play";
-    controls.appendChild(playBtn);
+    // --- Controls & animation loop (both skipped in static mode) -------------
+    var controls = null;
+    var playBtn = null;
+    var speedInput = null, scrubInput = null;
+    var extraInputs = [];
+    var playing = !reduceMotion && !isStatic;
+    var t = 0;               // normalized time in [0, 1)
+    var last = null;
+    var duration = scene.duration || 6;
 
     function makeSlider(id, label, min, max, step, value) {
       var wrap = document.createElement("label");
@@ -143,47 +142,24 @@
       return input;
     }
 
-    var speedInput = makeSlider("speed", "Speed", 0.1, 4, 0.1, 1);
-    var scrubInput = makeSlider("scrub", "Frame", 0, 1, 0.001, 0);
-
-    // Scene-declared extra sliders.
-    var extraInputs = [];
-    (scene.controls || []).forEach(function (c) {
-      extraInputs.push(
-        makeSlider(c.id, c.label, c.min, c.max, c.step, c.value)
-      );
-    });
-
-    function setPlaying(on) {
-      playing = on;
-      playBtn.textContent = on ? "⏸ Pause" : "▶ Play";
-      playBtn.setAttribute("aria-pressed", on ? "true" : "false");
-    }
-    playBtn.addEventListener("click", function () { setPlaying(!playing); });
-
-    // Scrubbing pauses so the reader can park on an exact moment.
-    scrubInput.addEventListener("input", function () {
-      setPlaying(false);
-      t = parseFloat(scrubInput.value);
-      render();
-    });
-
     function params() {
-      var p = { speed: parseFloat(speedInput.value) };
+      var p = { speed: speedInput ? parseFloat(speedInput.value) : 1 };
       extraInputs.forEach(function (inp) {
         p[inp.dataset.id] = parseFloat(inp.value);
       });
       return p;
     }
 
-    // --- Animation loop ------------------------------------------------------
-    var t = 0;               // normalized time in [0, 1)
-    var last = null;
-    var duration = scene.duration || 6;
-
     function render() {
       ctx.clearRect(0, 0, W, H);
       scene.draw(ctx, t, params());
+    }
+
+    function setPlaying(on) {
+      playing = on;
+      if (!playBtn) return;
+      playBtn.textContent = on ? "⏸ Pause" : "▶ Play";
+      playBtn.setAttribute("aria-pressed", on ? "true" : "false");
     }
 
     function frame(now) {
@@ -199,16 +175,44 @@
       requestAnimationFrame(frame);
     }
 
+    if (!isStatic) {
+      controls = document.createElement("div");
+      controls.className = "vcs-anim-controls";
+      host.appendChild(controls);
+
+      playBtn = document.createElement("button");
+      playBtn.type = "button";
+      playBtn.className = "vcs-anim-play";
+      controls.appendChild(playBtn);
+
+      speedInput = makeSlider("speed", "Speed", 0.1, 4, 0.1, 1);
+      scrubInput = makeSlider("scrub", "Frame", 0, 1, 0.001, 0);
+
+      // Scene-declared extra sliders.
+      (scene.controls || []).forEach(function (c) {
+        extraInputs.push(makeSlider(c.id, c.label, c.min, c.max, c.step, c.value));
+      });
+
+      playBtn.addEventListener("click", function () { setPlaying(!playing); });
+
+      // Scrubbing pauses so the reader can park on an exact moment.
+      scrubInput.addEventListener("input", function () {
+        setPlaying(false);
+        t = parseFloat(scrubInput.value);
+        render();
+      });
+
+      // Re-render on extra-slider changes even while paused.
+      extraInputs.forEach(function (inp) {
+        inp.addEventListener("input", render);
+      });
+    }
+
     // --- Wire up -------------------------------------------------------------
     resize();
     setPlaying(playing);
     render();
-    requestAnimationFrame(frame);
-
-    // Re-render on extra-slider changes even while paused.
-    extraInputs.forEach(function (inp) {
-      inp.addEventListener("input", render);
-    });
+    if (!isStatic) requestAnimationFrame(frame);
 
     // Responsive: re-fit on container width changes.
     if (window.ResizeObserver) {
@@ -807,6 +811,105 @@
         ctx.fillStyle = c.muted; ctx.font = "10px system-ui, sans-serif";
         ctx.fillText("Six writes a line — each register, twice — is why asymmetry is spent only where needed.",
           pad, footY + 15);
+      },
+    };
+  });
+
+  // ===========================================================================
+  // SCENE: "symmetry-examples" — reflected vs repeated, from one set of bits
+  // ===========================================================================
+  //
+  // STATIC (no play button / sliders): a small gallery. You write only the left
+  // 20 bits (drawn solid); the TIA generates the right 20 for free (drawn faded)
+  // — either mirrored (reflect, CTRLPF D0=1) or copied (repeat, D0=0). Two
+  // game-like motifs show how the *same* left half becomes a mountain/valley or
+  // a diamond under reflect, and rolling hills / twin triangles under repeat.
+  // ===========================================================================
+  VCSAnim.register("symmetry-examples", function (api) {
+    var ROWS = 6, HALF = 20;         // 20 bits = the left half of a 40-px line
+
+    // Each motif is a function(row, col0..19) -> lit, authored for the LEFT half.
+    function rampLit(row, col) {     // ground rising left -> right
+      var h = 1 + Math.round((col * 5) / (HALF - 1));   // height 1..6
+      return row >= ROWS - h;
+    }
+    function wedgeLit(row, col) {    // triangle that fattens toward the seam
+      return Math.abs(row - 2.5) <= (col / (HALF - 1)) * 2.5 + 0.01;
+    }
+    var MOTIFS = [
+      { name: "hillside", fn: rampLit },
+      { name: "emblem",   fn: wedgeLit },
+    ];
+
+    return {
+      static: true,
+      height: 264,
+      draw: function (ctx, t, p) {
+        var c = api.colors;
+        var W = api.width, H = api.height;
+        var solid = c.dark ? "#33ff66" : "#1f8a3b";
+        var pad = 16;
+
+        ctx.fillStyle = c.subtle; ctx.fillRect(0, 0, W, H);
+        ctx.textBaseline = "alphabetic";
+
+        ctx.fillStyle = c.muted; ctx.font = "12px system-ui, sans-serif"; ctx.textAlign = "left";
+        ctx.fillText("One set of 20 bits paints the whole 40-px line — two ways", pad, 20);
+
+        // layout: [motif label] [ Repeated screen ] [ Reflected screen ]
+        var labelW = 62, gap = 16;
+        var screenW = (W - pad * 2 - labelW - gap) / 2;
+        var screenH = 60, rowH = screenH / ROWS;
+        var xRep = pad + labelW;
+        var xRef = pad + labelW + screenW + gap;
+
+        // column headers
+        ctx.fillStyle = c.muted; ctx.font = "bold 11px system-ui, sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("Repeated · D0=0", xRep + screenW / 2, 40);
+        ctx.fillText("Reflected · D0=1", xRef + screenW / 2, 40);
+
+        function drawScreen(x, y, fn, reflect) {
+          var cellW = screenW / (HALF * 2);
+          ctx.fillStyle = c.dark ? "#000" : "#0a0f0a";
+          ctx.fillRect(x, y, screenW, screenH);
+          for (var row = 0; row < ROWS; row++) {
+            for (var col = 0; col < HALF * 2; col++) {
+              var generated = col >= HALF;
+              var src = !generated ? col : (reflect ? (HALF * 2 - 1 - col) : (col - HALF));
+              if (!fn(row, src)) continue;
+              ctx.globalAlpha = generated ? 0.4 : 1;     // faded = TIA-generated half
+              ctx.fillStyle = solid;
+              ctx.fillRect(x + col * cellW, y + row * rowH, cellW - 0.4, rowH - 0.4);
+              ctx.globalAlpha = 1;
+            }
+          }
+          ctx.strokeStyle = c.muted; ctx.strokeRect(x + 0.5, y + 0.5, screenW - 1, screenH - 1);
+          // center seam
+          ctx.strokeStyle = c.accent; ctx.globalAlpha = 0.55; ctx.setLineDash([3, 3]);
+          ctx.beginPath(); ctx.moveTo(x + screenW / 2, y); ctx.lineTo(x + screenW / 2, y + screenH); ctx.stroke();
+          ctx.setLineDash([]); ctx.globalAlpha = 1;
+        }
+
+        var y0 = 50;
+        for (var m = 0; m < MOTIFS.length; m++) {
+          var y = y0 + m * (screenH + 20);
+          ctx.fillStyle = c.muted; ctx.font = "11px ui-monospace, Menlo, monospace"; ctx.textAlign = "left";
+          ctx.fillText(MOTIFS[m].name, pad, y + screenH / 2 + 4);
+          drawScreen(xRep, y, MOTIFS[m].fn, false);
+          drawScreen(xRef, y, MOTIFS[m].fn, true);
+        }
+
+        // legend
+        var ly = y0 + MOTIFS.length * (screenH + 20) + 6;
+        ctx.textAlign = "left"; ctx.font = "10px system-ui, sans-serif";
+        ctx.fillStyle = solid;
+        ctx.fillRect(pad, ly - 8, 10, 10);
+        ctx.fillStyle = c.muted;
+        ctx.fillText("left 20 bits — you write these", pad + 15, ly);
+        var lx2 = pad + 15 + ctx.measureText("left 20 bits — you write these").width + 20;
+        ctx.globalAlpha = 0.4; ctx.fillStyle = solid; ctx.fillRect(lx2, ly - 8, 10, 10); ctx.globalAlpha = 1;
+        ctx.fillStyle = c.muted;
+        ctx.fillText("right 20 — TIA generates free", lx2 + 15, ly);
       },
     };
   });

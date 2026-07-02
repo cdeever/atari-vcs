@@ -18,6 +18,8 @@ How the right half is generated is set by **bit 0 of `CTRLPF`**, the reflect fla
 
 Either way, **both halves come from one set of register values.** That is the cheap deal: a single write of `PF0`/`PF1`/`PF2` per line paints the entire 40-pixel width. The cost is that with that one write you cannot show two *different* things on the two halves — only a pattern and its copy or mirror. (Breaking that limit is the [asymmetric playfield]({{< relref "asymmetric" >}}).)
 
+{{< vcsanim scene="symmetry-examples" caption="You author only the **left 20 bits** (solid); the TIA fills the right half for free (faded). The *same* bits become rolling hills or twin triangles when **repeated**, and a centered mountain or diamond when **reflected** — the whole difference is `CTRLPF` bit 0." >}}
+
 ## Choosing reflect or repeat
 
 - **Reflect** when the content is naturally symmetric — which most playfields are, so reflection is the common default. A maze, an arena, a framed border, or a centered emblem all look right mirrored.
