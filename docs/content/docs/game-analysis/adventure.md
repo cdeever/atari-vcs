@@ -65,6 +65,67 @@ Where does a game programmer in 1979 get that data-structure instinct, on a mach
 
 The hardware draws the famous line: two [players]({{< relref "/docs/sprites/drawing-a-player" >}}) means only **two objects visible per room** at once (the player avatar is the separate [ball]({{< relref "/docs/sprites/missiles-and-ball" >}})). When a room holds more — you, a dragon, *and* a dropped key — Adventure [flickers]({{< relref "/docs/hardware-quirks/more-quirks" >}}) them, the shimmer that's woven into the game's look.
 
+## Anatomy of an object: C structs in 6502
+
+Here is the payoff, and it's worth going slow, because this *is* the trick. Every object in Adventure is a **nine-byte record**, and the objects sit in one big **array** of those records. What makes it read like C is that Robinett gave each *field* of the record its own label — the `Store1`–`Store9` from above are not nine separate tables, they're the **nine byte-offsets of one struct**, sitting one apart. Straight from the disassembly's own header:
+
+```
+;Offset 0 : low byte  ┐ pointer -> object info (room, x, y)
+;Offset 1 : high byte ┘
+;Offset 2 : low byte  ┐ pointer -> object's current state
+;Offset 3 : high byte ┘
+;Offset 4 : low byte  ┐ pointer -> list of states (the state machine)
+;Offset 5 : high byte ┘
+;Offset 6 : colour
+;Offset 7 : colour in B&W
+;Offset 8 : size (NUSIZ)
+```
+
+So an object isn't "number 0, 1, 2." It's addressed by the **byte offset of its record**, and stepping to the next object means adding the record size:
+
+```
+       TYA
+       CLC
+       ADC    #$09        ; next object = this record + 9 bytes
+       CMP    #$A2        ; past the last? ($A2 = 18 objects × 9)
+       BCC    GetObjectsInfo
+```
+
+With that offset in an index register (`CacheObjects` keeps it in `Y` while it hunts; `SetupObjectPrint` loads it into `X` to draw), `LDA Store1,X` reads field 0 of *this* object and `LDA Store3,X` reads field 2 — the index register holds the object's base address and the `StoreN` labels are the field offsets. That is exactly the code a C compiler emits for `obj->field`, written out by hand.
+
+**Three of those fields are pointers.** Fields 0–1, 2–3, and 4–5 are 16-bit addresses stored low-byte-then-high, each pointing at *another* record. To follow one, the code copies it into a zero-page slot (`$93/$94`) and dereferences it with the 6502's indirect-indexed mode:
+
+```
+       LDA    Store1,X     ; obj->info   (low byte of the pointer)
+       STA    $93
+       LDA    Store2,X     ;             (high byte)
+       STA    $94
+       LDY    #$01
+       LDA    ($93),Y      ; info->x   → the object's X coordinate
+       STA    $86
+       LDY    #$02
+       LDA    ($93),Y      ; info->y   → the object's Y coordinate
+```
+
+`LDA ($93),Y` **is** `p->field`: `$93/$94` holds the pointer, `Y` is the offset into the record it points at, and the CPU fetches that byte. Offset 0 of that same record is the room — comparing it against the current room (`$8A`) is the whole test inside `CacheObjects`: *is this object standing in the room I'm about to draw?* And note the shape of the record it points to — `{room, X, Y}` — is identical to the player's own `$8A`/`$8B`/`$8C`. The avatar really is just object number zero.
+
+The last pointer is the elegant one: it runs the object's **state machine**. Field 2–3 points at a single byte — the current state; field 4–5 points at a **list of states**, three bytes per entry: `[state value, graphic-pointer-low, graphic-pointer-high]`. `GetObjectState` walks that list until it finds the current state…
+
+```
+GetObjectState_1:
+       CMP    ($93),Y      ; is this entry the current state?
+       BEQ    GetObjectState_2
+       BCC    GetObjectState_2
+       INY
+       INY
+       INY                  ; no → skip to the next 3-byte entry
+       JMP    GetObjectState_1
+```
+
+…and the two bytes immediately after the match are a **pointer to the bitmap** for that state — which the kernel then dereferences a *third* time, once per scanline, to draw the shape. Follow the whole chain: an array of structs → a pointer to the object's info → a pointer to its state list → a pointer to the right bitmap. Pointers to pointers to graphics, three levels deep, on a machine with 128 bytes of RAM.
+
+That is the C course showing through. `LDA ($93),Y` — indirect, indexed — is the instruction Thompson's language leans on for every `p->field` and `array[i]`, and Adventure's object engine is built almost entirely out of it.
+
 ## Dragons, a bat, and emergent chaos
 
 The world's actors each get their own mover: `MoveRedDragon`, `MoveYellowDragon`, `MoveGreenDragon` run three small state machines that wander, chase, bite, and die; `MoveBat` sends the bat flitting about to steal and swap whatever objects it fancies (it will happily fly a dragon to your doorstep). Add the carry-one-thing mechanic (`$9D`) and the key-locked castle gates (`Portals`), and none of these systems *know* about each other — yet they collide into stories. That emergent, anything-can-happen quality is exactly what made Adventure feel alive, and it falls out of the uniform object model almost for free. (Game variation 3 even reshuffles every object's starting room, so no two playthroughs match.)
