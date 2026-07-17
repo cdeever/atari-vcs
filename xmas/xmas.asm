@@ -9,14 +9,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Build-time options
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-SOUND_ENABLED = 0      ; 1 = play the music (+ RESET replays it), 0 = silent
+SOUND_ENABLED = 1      ; 1 = play the music (+ RESET replays it), 0 = silent
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Tree lights: 20 blinking bulbs drawn with missile 0.  Each bulb's
 ;; column and colour live in the BulbX / BulbColor tables (down near
 ;; the data at the bottom).  The DrawBulb subroutine (just after the
-;; frame loop) parks the missile with the classic divide-by-15 +
-;; HMOVE trick, so there is NO per-bulb nop padding.  A tree block
+;; frame loop) parks the missile by jumping into a shared nop sled
+;; (comb-free positioning), so there is NO per-bulb nop padding.  A tree block
 ;; draws its two bulbs with `jsr DrawBulb` x2; the two share a blink
 ;; flag (Light0On..Light9On, indexed by bulb/2 = block).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,6 +41,8 @@ Light7On  .byte
 Light8On  .byte
 Light9On  .byte
 BulbIdx   .byte      ; walks 0..19 through the bulb tables each frame
+SledPtr   .byte      ; nop-sled jump target, lo byte...
+SledPtrH  .byte      ;   ...and hi byte (SledPtr+1, for jmp (SledPtr))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Start our ROM code
@@ -477,42 +479,46 @@ StartFrame:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; DrawBulb: draw one tree bulb (missile 0), advancing BulbIdx.
-;; Uses 4 scanlines: 1 to park the missile at BulbX[i] via the
-;; divide-by-15 + HMOVE idiom (the loop's runtime IS the coarse
-;; position; the remainder becomes the HMM0 fine adjust), then 3 to
-;; show the bulb in BulbColor[i], lit/dark per its block's flag.
-;; NOTE: HMOVE leaves a faint comb on the far-left of the first show
-;; row.  If the whole field sits left/right of where you want, shift
-;; every BulbX value by the same amount (that is the global knob).
+;; COMB-FREE positioning: rather than divide-by-15 + HMOVE (which
+;; leaves a comb on the far left), it jumps INTO a shared run of nops
+;; so exactly BulbX[i] of them run before the RESM0 strobe -- the nop
+;; count IS the column (6 px per nop), timed purely by the missile, so
+;; there is no HMOVE and no comb.  Entry = MAXNOPS - BulbX[i] bytes
+;; into the sled.  Uses 4 scanlines: 1 to park, 3 to show the bulb.
+;; Global knob: shift every BulbX by the same amount (fewer = left).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MAXNOPS = 30                   ; length of the shared nop sled
+
 DrawBulb:
     ldx BulbIdx
-    lda BulbX,x            ; A = this bulb's target column
-    sta WSYNC              ; --- position row (missile off) ---
-    ldy #0
-    sty ENAM0              ; missile off while it is repositioned
+    lda #MAXNOPS
     sec
-.d15:
-    sbc #15                ; loop time = coarse position (15px steps)
-    bcs .d15
-    eor #$07               ; remainder -> HMOVE fine nibble
-    asl
-    asl
-    asl
-    asl
-    sta HMM0               ; fine motion for missile 0
-    sta RESM0              ; coarse strobe
-    sta WSYNC              ; --- show row 1 ---
-    sta HMOVE              ; apply fine adjust (comb lands far-left)
+    sbc BulbX,x            ; A = MAXNOPS - nopcount = entry offset
+    clc
+    adc #<Sled
+    sta SledPtr
+    lda #>Sled
+    adc #0                ; carry into the high byte if it wrapped
+    sta SledPtrH          ; SledPtr -> Sled + entry  (all pre-WSYNC)
+    sta WSYNC             ; --- position row (missile off) ---
+    ldy #0
+    sty ENAM0
+    jmp (SledPtr)         ; run BulbX[i] nops, then fall into RESM0
+Sled:
+    REPEAT MAXNOPS
+        nop
+    REPEND
+    sta RESM0             ; park the missile (nops before set its column)
+    sta WSYNC             ; --- show row 1 ---
     lda BulbColor,x
-    sta COLUP0             ; this bulb's colour
+    sta COLUP0            ; this bulb's colour
     txa
-    lsr                    ; bulb/2 = block index -> blink flag
+    lsr                   ; bulb/2 = block index -> blink flag
     tay
     lda Light0On,y
-    sta ENAM0              ; lit ($02) or dark ($00) this frame
-    sta WSYNC              ; --- show row 2 ---
-    sta WSYNC              ; --- show row 3 ---
+    sta ENAM0             ; lit ($02) or dark ($00) this frame
+    sta WSYNC             ; --- show row 2 ---
+    sta WSYNC             ; --- show row 3 ---
     inc BulbIdx
     rts
 
@@ -533,11 +539,12 @@ StarBitmap:
     .byte $18, $99, $7E, $FF, $FF, $7E, $99, $18
 
 ; The 20 tree bulbs, in draw order (block 3 top -> base, 2 per block).
-; BulbX = target screen column (0-159); shift them all by a constant
-; to recenter the whole field.  BulbColor = COLUP0 value per bulb.
+; BulbX = nop count fed to the sled (~6 px per nop, max MAXNOPS);
+; shift them all by the same amount to slide the field (fewer = left).
+; BulbColor = COLUP0 value per bulb.
 BulbX:
-    .byte  65, 71, 59, 77, 71, 53, 59, 83, 71, 47
-    .byte  59,89, 71, 41, 59,95, 71, 35, 59,101
+    .byte  17, 18, 16, 19, 18, 15, 16, 20, 18, 14
+    .byte  16, 21, 18, 13, 16, 22, 18, 12, 16, 23
 BulbColor:
     .byte $46,$0E,$2A,$B6,$9A,$1C,$0E,$46,$66,$88
     .byte $56,$2A,$1A,$66,$B6,$1A,$88,$56,$1C,$9A
