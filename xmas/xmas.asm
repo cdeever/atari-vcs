@@ -12,33 +12,14 @@
 SOUND_ENABLED = 0      ; 1 = play the music (+ RESET replays it), 0 = silent
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; MLIGHT {1}, {2}, {3}: draw one blinking tree light as missile 0.
-;; Unlike the ball/playfield, the missile has its OWN colour
-;; register (COLUP0), so a bulb is a clean ~4x3 px dot in any colour
-;; drawn on top of the tree -- no mid-line COLUPF trickery.
-;;   {1} = nop count = HORIZONTAL POSITION (~pixel 6*{1}-60; each
-;;         +1 nudges the bulb ~6 px right).  This positions missile 0
-;;         via a timed RESM0 strobe.
-;;   {2} = bulb colour (written to COLUP0).
-;;   {3} = zero-page blink flag ($02 = lit this frame, $00 = dark).
-;; Occupies 4 scanlines (1 to reposition + 3 showing the bulb).
+;; Tree lights: 20 blinking bulbs drawn with missile 0.  Each bulb's
+;; column and colour live in the BulbX / BulbColor tables (down near
+;; the data at the bottom).  The DrawBulb subroutine (just after the
+;; frame loop) parks the missile with the classic divide-by-15 +
+;; HMOVE trick, so there is NO per-bulb nop padding.  A tree block
+;; draws its two bulbs with `jsr DrawBulb` x2; the two share a blink
+;; flag (Light0On..Light9On, indexed by bulb/2 = block).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    MAC MLIGHT
-    sta WSYNC            ; align to a fresh line FIRST, so the RESM0
-    lda #0              ;   strobe timing is identical for every bulb
-    sta ENAM0           ;   (missile off while it is repositioned)
-    REPEAT {1}
-        nop
-    REPEND
-    sta RESM0            ; park missile 0 at this bulb's column
-    lda #{2}
-    sta COLUP0           ; this bulb's colour
-    lda {3}
-    sta ENAM0            ; blink: lit ($02) or dark ($00) this frame
-    sta WSYNC            ; bulb row 1
-    sta WSYNC            ; bulb row 2
-    sta WSYNC            ; bulb row 3
-    ENDM
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Uninitialized RAM variables (zeroed at boot by CLEAN_START)
@@ -59,6 +40,7 @@ Light6On  .byte
 Light7On  .byte
 Light8On  .byte
 Light9On  .byte
+BulbIdx   .byte      ; walks 0..19 through the bulb tables each frame
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Start our ROM code
@@ -308,6 +290,7 @@ StartFrame:
     stx PF1
     stx PF2
     stx GRP0               ; no star over the upper sky
+    stx BulbIdx            ; rewind the bulb table walk for this frame
     REPEAT 35
         sta WSYNC
     REPEND
@@ -342,102 +325,92 @@ StartFrame:
 
     ldx #%11100000
     stx PF2
-    MLIGHT 19, $46, Light0On   ; red, center
-    MLIGHT 20, $0E, Light0On   ; white, center
+    jsr DrawBulb               ; bulbs 0,1  (red, white)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
 
     ldx #%11110000
     stx PF2
-    MLIGHT 18, $2A, Light5On   ; orange, center
-    MLIGHT 21, $B6, Light5On   ; cyan, right
+    jsr DrawBulb               ; bulbs 2,3  (orange, cyan)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
 
     ldx #%11111000
     stx PF2
-    MLIGHT 20, $9A, Light1On   ; blue, center
-    MLIGHT 17, $1C, Light1On   ; yellow, left
+    jsr DrawBulb               ; bulbs 4,5  (blue, yellow)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
 
     ldx #%11111100
     stx PF2
-    MLIGHT 18, $0E, Light6On   ; white, center
-    MLIGHT 22, $46, Light6On   ; red, right
+    jsr DrawBulb               ; bulbs 6,7  (white, red)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
     ldx #%11111110
     stx PF2
-    MLIGHT 20, $66, Light2On   ; magenta, center
-    MLIGHT 16, $88, Light2On   ; azure, left
+    jsr DrawBulb               ; bulbs 8,9  (magenta, azure)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
 
     ldx #%11111111
     stx PF2
-    MLIGHT 18, $56, Light7On   ; purple, center
-    MLIGHT 23, $2A, Light7On   ; orange, right
+    jsr DrawBulb               ; bulbs 10,11  (purple, orange)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
 
     ldx #%00000001
     stx PF1
-    MLIGHT 20, $1A, Light8On   ; gold, center
-    MLIGHT 15, $66, Light8On   ; magenta, left
+    jsr DrawBulb               ; bulbs 12,13  (gold, magenta)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
 
     ldx #%00000011
     stx PF1
-    MLIGHT 18, $B6, Light3On   ; cyan, center
-    MLIGHT 24, $1A, Light3On   ; gold, right
+    jsr DrawBulb               ; bulbs 14,15  (cyan, gold)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
 
     ldx #%00000111
     stx PF1
-    MLIGHT 20, $88, Light9On   ; azure, center
-    MLIGHT 14, $56, Light9On   ; purple, far left
+    jsr DrawBulb               ; bulbs 16,17  (azure, purple)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
 
     ldx #%00001111
     stx PF1
-    MLIGHT 18, $1C, Light4On   ; yellow, center
-    MLIGHT 25, $9A, Light4On   ; blue, far right
+    jsr DrawBulb               ; bulbs 18,19  (yellow, blue)
+    jsr DrawBulb
+    sta WSYNC
     lda #0
     sta ENAM0
-    REPEAT 2
-        sta WSYNC
-    REPEND
+    sta WSYNC
 
     ; Start trunk
     ldx #%10000000
@@ -502,6 +475,47 @@ StartFrame:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     jmp StartFrame
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DrawBulb: draw one tree bulb (missile 0), advancing BulbIdx.
+;; Uses 4 scanlines: 1 to park the missile at BulbX[i] via the
+;; divide-by-15 + HMOVE idiom (the loop's runtime IS the coarse
+;; position; the remainder becomes the HMM0 fine adjust), then 3 to
+;; show the bulb in BulbColor[i], lit/dark per its block's flag.
+;; NOTE: HMOVE leaves a faint comb on the far-left of the first show
+;; row.  If the whole field sits left/right of where you want, shift
+;; every BulbX value by the same amount (that is the global knob).
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+DrawBulb:
+    ldx BulbIdx
+    lda BulbX,x            ; A = this bulb's target column
+    sta WSYNC              ; --- position row (missile off) ---
+    ldy #0
+    sty ENAM0              ; missile off while it is repositioned
+    sec
+.d15:
+    sbc #15                ; loop time = coarse position (15px steps)
+    bcs .d15
+    eor #$07               ; remainder -> HMOVE fine nibble
+    asl
+    asl
+    asl
+    asl
+    sta HMM0               ; fine motion for missile 0
+    sta RESM0              ; coarse strobe
+    sta WSYNC              ; --- show row 1 ---
+    sta HMOVE              ; apply fine adjust (comb lands far-left)
+    lda BulbColor,x
+    sta COLUP0             ; this bulb's colour
+    txa
+    lsr                    ; bulb/2 = block index -> blink flag
+    tay
+    lda Light0On,y
+    sta ENAM0              ; lit ($02) or dark ($00) this frame
+    sta WSYNC              ; --- show row 2 ---
+    sta WSYNC              ; --- show row 3 ---
+    inc BulbIdx
+    rts
+
 
 ; "We Wish You a Merry Christmas" (key of G), then a happy new year.
 ; Format: (AUDF pitch, duration in frames).  ~60 fps, so beat = 24
@@ -517,6 +531,16 @@ TwinkleColors:
 ;   $18 = ...##...   $99 = #..##..#   $7E = .######.   $FF = ########
 StarBitmap:
     .byte $18, $99, $7E, $FF, $FF, $7E, $99, $18
+
+; The 20 tree bulbs, in draw order (block 3 top -> base, 2 per block).
+; BulbX = target screen column (0-159); shift them all by a constant
+; to recenter the whole field.  BulbColor = COLUP0 value per bulb.
+BulbX:
+    .byte  65, 71, 59, 77, 71, 53, 59, 83, 71, 47
+    .byte  59,89, 71, 41, 59,95, 71, 35, 59,101
+BulbColor:
+    .byte $46,$0E,$2A,$B6,$9A,$1C,$0E,$46,$66,$88
+    .byte $56,$2A,$1A,$66,$B6,$1A,$88,$56,$1C,$9A
 
 Song:
     ; -- "We wish you a merry Christmas" --
