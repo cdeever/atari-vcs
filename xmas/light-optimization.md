@@ -1,10 +1,10 @@
-# Optimizing the tree lights — a 2600 ROM story
+# Optimizing the tree lights ROM footprint
 
 A worked example from `xmas.asm`: how the 20 blinking tree bulbs went from
 eating **half the cartridge** to a small routine plus a data table — and the
 one visible glitch that optimization introduced, and how it was fixed.
 
-The whole thing is three git commits, so `git diff` between them is the lesson:
+The whole thing is three git commits, so `git diff` between them shows the progression:
 
 | commit | state |
 |--------|-------|
