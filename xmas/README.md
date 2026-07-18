@@ -4,6 +4,8 @@
 
 This is the repository's most developed program and a clean example of a **playfield-only kernel**: there are no sprites at all. The entire picture — a green tree on a red background — is drawn by rewriting the playfield registers as the beam moves down the screen.
 
+**See also:** [Techniques used](techniques.md) (the parts list) · [Optimizing the tree lights](light-optimization.md) (a ROM-footprint deep-dive).
+
 ## Build & run
 
 ```sh

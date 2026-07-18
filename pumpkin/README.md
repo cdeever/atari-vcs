@@ -4,6 +4,8 @@
 
 A jack-o'-lantern on a black field that sits with a candle flickering inside it, then throws its head back and lets out an evil laugh — on power-on, when you press **RESET**, and when you press the joystick **fire** button. Like the [Christmas tree](../xmas/README.md), the whole pumpkin is a **reflected playfield** with no sprites, but this one adds a per-frame audio engine and a cycle-counted mid-scanline color kernel.
 
+**See also:** [Techniques used](techniques.md) (the parts list) · [The one cycle that turned NTSC into PAL](wsync-timing-bug.md) (a debugging deep-dive).
+
 ## Build & run
 
 ```sh
