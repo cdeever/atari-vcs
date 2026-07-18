@@ -26,12 +26,13 @@
 ;; for throat.  Volume falls and the bursts slow across the ~1.5 s laugh.
 ;; It fires once at power-on, and again on RESET or the joystick button.
 ;;
-;; STROBE: while the laugh plays, the face flashes black <-> hot white
-;; (~7.5 Hz) like a strobe light inside the pumpkin.  Since a scanline has
-;; only one background color, a cycle-counted per-line kernel (see the face
-;; band below) switches COLUBK to white ONLY across the interior and back to
-;; black at the screen edges, so the glow stays inside the outline -- the
-;; sky beside the pumpkin never flashes.  Idle, COLUBK stays black.
+;; GLOW: the face cutouts are lit from within.  Idle, they flicker through
+;; warm ambers (CandleColors) like a candle; while the laugh plays they
+;; flash hard white like a strobe.  Since a scanline has only one background
+;; color, a cycle-counted per-line kernel (see the face band below) switches
+;; COLUBK to the glow color ONLY across the interior and back to black at the
+;; screen edges, so the light stays inside the outline -- the sky beside the
+;; pumpkin never lights up.
 ;;
 ;; Column -> register-bit map for the left half (col 0 = screen-left edge,
 ;; col 19 = center):  PF0 = cols 0..3 (bits 4-7); PF1 = cols 4..11
@@ -58,6 +59,8 @@ RowTimer    .byte      ; frames remaining on the current data row
 FrameCtr    .byte      ; free-running frame counter -> strobe parity
 StrobeColor .byte      ; COLUBK for the face band this frame ($00 or STROBE_ON)
 TrigPrev    .byte      ; last frame's FIRE|RESET state (for edge detection)
+Rand        .byte      ; LFSR -> the candle glow's random flicker
+CandleCol   .byte      ; current idle candle shade, held between random picks
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Start our ROM code
@@ -80,6 +83,9 @@ Reset:
     sta AUDC1             ; ch1 = a low voice drone under the noise...
     lda #VOICE_PITCH
     sta AUDF1             ; ...at a fixed pitch, so it never forms a melody
+
+    lda #$C5
+    sta Rand               ; seed the LFSR non-zero (0 would lock it up)
 
     lda #1
     sta LaughActive        ; laugh once at power-on (Ptr/RowTimer already 0)
@@ -135,14 +141,36 @@ StartFrame:
 .laughIdle:
     sta WSYNC              ; [line 2] closes the tick line
 
-    ; --- strobe: pick this frame's face-glow color (its own line, so the
-    ; audio tick above always fits comfortably in one scanline) ---
-    inc FrameCtr           ; free-running -> drives the strobe cadence
-    ldy #$00               ; idle, or the "dark" half of the strobe
+    ; --- pick this frame's face-glow color (its own line, so the audio
+    ; tick above always fits comfortably in one scanline).  While laughing:
+    ; a hard white strobe.  Idle: a soft candle glow that wavers through
+    ; warm ambers, so the face looks lit from within. ---
+    inc FrameCtr           ; free-running -> drives both cadences
+
+    lda Rand               ; advance the LFSR every frame (candle randomness)
+    lsr
+    bcc .noEor
+    eor #$B4               ; tap -> pseudo-random 8-bit sequence
+.noEor:
+    sta Rand
+    lda FrameCtr           ; every 8 frames (~7.5x/sec) pick a new warm shade
+    and #$07
+    bne .haveCandle
+    lda Rand
+    and #$0F
+    tax
+    lda CandleColors,x
+    sta CandleCol          ; ...and hold it until the next pick
+.haveCandle:
+
     lda LaughActive
-    beq .setStrobe
+    bne .laughStrobe
+    ldy CandleCol          ; idle -> the current candle shade
+    jmp .setStrobe
+.laughStrobe:
+    ldy #$00               ; the "dark" half of the strobe
     lda FrameCtr
-    and #%00000100         ; flip every 4 frames (~7.5 Hz) -> a calmer strobe
+    and #%00000100         ; flip every 4 frames -> hard white flash
     beq .setStrobe
     ldy #STROBE_ON
 .setStrobe:
@@ -383,6 +411,18 @@ LaughData:
     .byte  20, 4,1,20, 2,2, 0, 0,5   ; huh
     .byte  22, 3,1,22, 1,2, 0, 0,5   ; huh (final, lowest, sparsest)
     .byte  $FF                        ; end -> mute both voices, stop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Candle-glow palette: the warm shades the face cutouts flicker through when
+;; idle.  A new one is chosen at random (via the LFSR) every 8 frames, so it
+;; flickers like the Christmas-tree star's twinkle but without a fixed pattern.
+;; All are yellow-gold or BRIGHT orange (luminance >= A) -- deliberately never
+;; the body orange ($38) or dimmer, so the eyes/nose/mouth never blend into
+;; the pumpkin.  Add/repeat entries to bias the mix (more $1x = more yellow).
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+CandleColors:
+    .byte $1E,$1C,$1A,$2E,$2C,$1C,$1E,$1A
+    .byte $2E,$1C,$1A,$2C,$1E,$1C,$1A,$2E
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Per-scanline playfield for the face band, one byte per line.  The kernel
