@@ -20,10 +20,11 @@
 ;;
 ;; SOUND: an "evil laugh" approximated on the TIA.  PCM playback would eat
 ;; 100% CPU (no video), so instead a frame-driven envelope player walks a
-;; small (AUDF, AUDV, frames) table once per frame in VBLANK.  A laugh is
-;; breathy RHYTHM, not melody -- so ch0 is NOISE (AUDC0 = 8) pulsed into
-;; sharp "ha ha ha" bursts, with ch1 a fixed-pitch voice drone underneath
-;; for throat.  Volume falls and the bursts slow across the ~1.5 s laugh.
+;; small (voice-pitch, volume, frames) table once per frame in VBLANK.  A
+;; laugh sits between song and drum: ch1 is a pitched voice (AUDC1 = 6) that
+;; BENDS DOWN through each "ha" (the falling bark that reads as laughing),
+;; and ch0 is breath noise at half volume for the "h".  Pitch and volume
+;; descend across the ~1.5 s laugh for the classic "MWA-ha-ha-ha..." fade.
 ;; It fires once at power-on, and again on RESET or the joystick button.
 ;;
 ;; GLOW: the face cutouts are lit from within.  Idle, they flicker through
@@ -42,9 +43,9 @@
 PUMPKIN_COLOR = $38            ; bright pumpkin orange (COLUPF)
 STEM_COLOR    = $D4            ; green stem (COLUPF, stem band only)
 BG_COLOR      = $00            ; black night sky (COLUBK)
-LAUGH_NOISE   = $08            ; AUDC0: breathy noise -- the "h" of each "ha"
-VOICE_TIMBRE  = $06            ; AUDC1: deep tone under the noise (throat)
-VOICE_PITCH   = $0A            ; AUDF1: constant low voice pitch (no melody)
+VOICE_TIMBRE  = $06            ; AUDC1: pitched tone -- the "vowel" of each "ha"
+BREATH_NOISE  = $08            ; AUDC0: noise -- the breathy "h" (half volume)
+BREATH_SHADE  = $06            ; AUDF0: fixed noise darkness for the breath
 STROBE_ON     = $0E            ; hot-white face flash while laughing
 FACELINES     = 86             ; scanlines in the face band (shoulders..chin-b)
 
@@ -59,8 +60,9 @@ RowTimer    .byte      ; frames remaining on the current data row
 FrameCtr    .byte      ; free-running frame counter -> strobe parity
 StrobeColor .byte      ; COLUBK for the face band this frame ($00 or STROBE_ON)
 TrigPrev    .byte      ; last frame's FIRE|RESET state (for edge detection)
-Rand        .byte      ; LFSR -> the candle glow's random flicker
+Rand        .byte      ; LFSR -> candle glow flicker + laugh voice warble
 CandleCol   .byte      ; current idle candle shade, held between random picks
+VoicePitch  .byte      ; current laugh row's base AUDF1 (before per-frame warble)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Start our ROM code
@@ -77,12 +79,12 @@ Reset:
     lda #%00000001         ; CTRLPF: reflect playfield (D0) -> symmetry
     sta CTRLPF
 
-    lda #LAUGH_NOISE
-    sta AUDC0              ; ch0 = breathy noise (rumble shade set per frame)
+    lda #BREATH_NOISE
+    sta AUDC0             ; ch0 = breath noise (fixed shade; volume pulses)
+    lda #BREATH_SHADE
+    sta AUDF0
     lda #VOICE_TIMBRE
-    sta AUDC1             ; ch1 = a low voice drone under the noise...
-    lda #VOICE_PITCH
-    sta AUDF1             ; ...at a fixed pitch, so it never forms a melody
+    sta AUDC1             ; ch1 = the voice tone; its pitch AUDF1 bends per row
 
     lda #$C5
     sta Rand               ; seed the LFSR non-zero (0 would lock it up)
@@ -116,10 +118,10 @@ StartFrame:
     lda RowTimer
     beq .nextRow           ; current row finished -> fetch the next
     dec RowTimer
-    jmp .laughIdle
+    jmp .laughIdle         ; hold this row (pitch is warbled on line 3)
 .nextRow:
     ldx LaughPtr
-    lda LaughData,x        ; AUDF value (or $FF = end of laugh)
+    lda LaughData,x        ; voice pitch AUDF1 (or $FF = end of laugh)
     cmp #$FF
     bne .playRow
     lda #0
@@ -128,11 +130,18 @@ StartFrame:
     sta LaughActive        ; ...and stop (face returns to normal below)
     jmp .laughIdle
 .playRow:
-    sta AUDF0              ; noise "rumble shade" for this row
+    sta VoicePitch         ; base pitch -- sweeps down across each syllable
     inx
-    lda LaughData,x
-    sta AUDV0              ; envelope volume -> the noise...
-    sta AUDV1              ; ...and the voice drone pulse together
+    lda LaughData,x        ; packed volume: voice (high nybble) | breath (low)
+    tay
+    and #$0F
+    sta AUDV0              ; breath noise = low nybble (can lead -> the "h")
+    tya
+    lsr
+    lsr
+    lsr
+    lsr
+    sta AUDV1              ; voice = high nybble
     inx
     lda LaughData,x
     sta RowTimer           ; hold this row for N frames
@@ -175,6 +184,17 @@ StartFrame:
     ldy #STROBE_ON
 .setStrobe:
     sty StrobeColor
+
+    ; --- laugh voice warble: nudge AUDF1 +/- a step each frame for a rough,
+    ; gravelly growl instead of a clean tone (uses this frame's fresh LFSR) ---
+    lda LaughActive
+    beq .noWarble
+    lda Rand
+    and #1
+    clc
+    adc VoicePitch
+    sta AUDF1
+.noWarble:
 
     sta WSYNC              ; [line 3] closes the strobe line
     REPEAT 34
@@ -386,31 +406,39 @@ StartFrame:
     jmp StartFrame
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Evil-laugh envelope.  Rows are (AUDF, AUDV, frames); AUDF $FF ends the
-;; laugh (mute + stop).  Each syllable is 3 rows -- a sharp attack, a quick
-;; decay, then a silent (AUDV=0) gap -- which chops the noise into a punchy
-;; "ha".  AUDF here shades the NOISE (ch0) rather than picking a pitch, so
-;; nothing forms a melody; it rises across the laugh so the rumble darkens.
-;; Volume falls and the gaps widen so the cackle slows as it dies off.
-;; (Generated by scratchpad/gen_laugh.py -- edit the syllable list there.)
+;; Evil-laugh envelope.  Rows are (AUDF1 voice-pitch, packed-volume, frames);
+;; AUDF1 $FF ends.  The volume byte packs BOTH voices: voice = high nybble
+;; (AUDV1), breath-noise = low nybble (AUDV0).  So each "ha" leads with a
+;; breath frame (voice off, noise on = the aspirated "h") before the voice
+;; swells in -- otherwise the tone slams on and sounds like a plosive "B".
+;; The voice is a ROUGH poly-tone (AUDC 6, the Adventure "eaten" timbre),
+;; each "ha" a big DOWNWARD pitch sweep (AUDF ramps up = pitch falls) with a
+;; per-frame +/-1 warble for grit; start pitches are jittered off any scale.
+;; It opens with a breathed-in "MWAAA" wail, then a staccato train that
+;; tightens and trails into low "huh" chuckles.  AUDC6 /31: AUDF ~5..16 =
+;; ~155..57 Hz.  (Generated by scratchpad/gen_laugh.py -- DEEPEN sets pitch.)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 LaughData:
-    .byte   5,15,1, 5, 6,2, 0, 0,2   ; HA  (loud, bright, fast)
-    .byte   5,15,1, 5, 6,2, 0, 0,2   ; HA
-    .byte   6,14,1, 6, 6,2, 0, 0,2   ; HA
-    .byte   7,13,1, 7, 5,2, 0, 0,2   ; ha  (run begins, darkening)
-    .byte   8,12,1, 8, 5,2, 0, 0,3   ; ha
-    .byte   9,12,1, 9, 5,2, 0, 0,2   ; ha
-    .byte   8,11,1, 8, 4,2, 0, 0,3   ; ha
-    .byte  10,11,1,10, 4,2, 0, 0,2   ; ha
-    .byte  11,10,1,11, 4,2, 0, 0,3   ; ha
-    .byte  12, 9,1,12, 4,2, 0, 0,3   ; ha
-    .byte  14, 7,1,14, 3,2, 0, 0,4   ; huh (chuckles: slower, quieter)
-    .byte  16, 6,1,16, 2,2, 0, 0,4   ; huh
-    .byte  18, 5,1,18, 2,2, 0, 0,4   ; huh
-    .byte  20, 4,1,20, 2,2, 0, 0,5   ; huh
-    .byte  22, 3,1,22, 1,2, 0, 0,5   ; huh (final, lowest, sparsest)
-    .byte  $FF                        ; end -> mute both voices, stop
+    .byte  7,$0A,2,   7,$88,1,   8,$D5,1   ; MWAAA (breathe in -> falling wail)
+    .byte  9,$F3,2,  11,$E2,2,  13,$B1,2
+    .byte 12,$00,2,   5,$09,1,   5,$F3,1
+    .byte  9,$60,1,   9,$00,2,   7,$09,1
+    .byte  7,$E3,1,  10,$50,1,  10,$00,2
+    .byte  6,$09,1,   6,$F3,1,  10,$60,1
+    .byte 10,$00,2,   8,$09,1,   8,$D3,1
+    .byte 12,$50,1,  12,$00,2,   6,$09,1
+    .byte  6,$E3,1,  11,$50,1,  11,$00,2
+    .byte  9,$09,1,   9,$D3,1,  12,$50,1
+    .byte 12,$00,3,   7,$09,1,   7,$C3,1
+    .byte 11,$40,1,  11,$00,3,  10,$09,1
+    .byte 10,$B3,1,  14,$40,1,  14,$00,3
+    .byte 11,$09,1,  11,$A3,1,  14,$40,1
+    .byte 14,$00,4,  12,$09,1,  12,$83,1
+    .byte 15,$30,1,  15,$00,5,  13,$09,1
+    .byte 13,$63,1,  15,$20,1,  15,$00,6
+    .byte 14,$09,1,  14,$43,1,  16,$10,1
+    .byte 16,$00,7
+    .byte  $FF                             ; end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Candle-glow palette: the warm shades the face cutouts flicker through when
